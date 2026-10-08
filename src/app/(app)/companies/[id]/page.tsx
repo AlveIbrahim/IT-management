@@ -66,7 +66,7 @@ export default function CompanyDetailPage() {
 
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex items-center gap-4">
-          <div className="bg-primary/10 text-primary grid size-14 place-items-center rounded-xl text-lg font-bold">
+          <div className="bg-primary/35 text-brand-ink grid size-14 place-items-center rounded-xl text-lg font-bold">
             {company.name
               .split(/[\s&]+/)
               .filter(Boolean)

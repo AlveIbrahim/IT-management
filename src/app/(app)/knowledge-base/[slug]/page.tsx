@@ -128,10 +128,10 @@ export default function ArticlePage() {
         </article>
 
         <aside className="space-y-4">
-          <Card className="border-primary/30 bg-primary/5 gap-3">
+          <Card className="border-brand-ink/30 bg-primary/20 gap-3">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <LifeBuoy className="text-primary size-5" />
+                <LifeBuoy className="text-brand-ink size-5" />
                 Still stuck?
               </CardTitle>
             </CardHeader>
@@ -149,7 +149,7 @@ export default function ArticlePage() {
             <CardContent className="space-y-1">
               {related.map((r) => (
                 <Link key={r.id} href={`/knowledge-base/${r.slug}`} className="hover:bg-muted/50 -mx-2 flex items-start gap-2 rounded-md px-2 py-2 text-sm">
-                  <BookOpen className="text-primary mt-0.5 size-4 shrink-0" />
+                  <BookOpen className="text-brand-ink mt-0.5 size-4 shrink-0" />
                   {r.title}
                 </Link>
               ))}

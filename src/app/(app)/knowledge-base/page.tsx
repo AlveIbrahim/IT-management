@@ -72,11 +72,11 @@ export default function KnowledgeBasePage() {
               key={c}
               onClick={() => setCategory(active ? null : c)}
               className={cn(
-                "bg-card hover:border-primary/40 flex items-center gap-4 rounded-xl border p-4 text-left transition-colors",
-                active && "border-primary ring-primary/20 ring-2",
+                "bg-card hover:border-brand-ink/40 flex items-center gap-4 rounded-xl border p-4 text-left transition-colors",
+                active && "border-brand-ink ring-brand-ink/20 ring-2",
               )}
             >
-              <span className="bg-primary/10 text-primary grid size-11 shrink-0 place-items-center rounded-lg">
+              <span className="bg-primary/35 text-brand-ink grid size-11 shrink-0 place-items-center rounded-lg">
                 <Icon className="size-5" />
               </span>
               <div className="min-w-0 flex-1">
@@ -112,7 +112,7 @@ export default function KnowledgeBasePage() {
         <Card className="gap-0 divide-y py-0">
           {results.map((a) => (
             <Link key={a.id} href={`/knowledge-base/${a.slug}`} className="hover:bg-muted/40 flex items-center gap-4 px-5 py-4 transition-colors">
-              <BookOpen className="text-primary size-5 shrink-0" />
+              <BookOpen className="text-brand-ink size-5 shrink-0" />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{a.title}</span>

@@ -103,7 +103,7 @@ export default function CmsPage() {
           <Card key={s.label} className="gap-2 py-5">
             <CardHeader className="px-5">
               <CardDescription className="flex items-center gap-2 font-medium">
-                <s.icon className="text-primary size-4" />
+                <s.icon className="text-brand-ink size-4" />
                 {s.label}
               </CardDescription>
             </CardHeader>
@@ -113,7 +113,7 @@ export default function CmsPage() {
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Tabs value={type} onValueChange={(v) => setType(v as ContentType)}>
+        <Tabs value={type} onValueChange={(v) => setType(v as ContentType)} className="max-w-full min-w-0">
           <TabsList>
             {(Object.keys(TYPE_META) as ContentType[]).map((t) => {
               const Icon = TYPE_META[t].icon;

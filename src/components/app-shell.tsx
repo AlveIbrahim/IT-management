@@ -108,7 +108,7 @@ function NavLink({ item, onNavigate }: { item: NavItem; onNavigate?: () => void 
           : "text-sidebar-foreground/75 hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground",
       )}
     >
-      <Icon className={cn("size-4 shrink-0", active ? "text-sidebar-primary-foreground" : "opacity-70")} />
+      <Icon className={cn("size-4 shrink-0", active ? "text-sidebar-primary" : "opacity-70")} />
       <span className="flex-1 truncate">{item.label}</span>
       {openCount > 0 && (
         <span

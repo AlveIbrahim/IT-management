@@ -53,10 +53,10 @@ function StatTile({
 }) {
   return (
     <Link href={href} className="group">
-      <Card className="group-hover:border-primary/40 gap-3 py-5 transition-colors">
+      <Card className="group-hover:border-brand-ink/40 gap-3 py-5 transition-colors">
         <CardHeader className="px-5">
           <CardDescription className="flex items-center gap-2 font-medium">
-            <Icon className={cn("size-4", tone === "warning" ? "text-red-600 dark:text-red-400" : "text-primary")} />
+            <Icon className={cn("size-4", tone === "warning" ? "text-red-600 dark:text-red-400" : "text-brand-ink")} />
             {label}
           </CardDescription>
           <CardAction>
@@ -303,7 +303,11 @@ export default function DashboardPage() {
                     <span className="truncate font-medium">{u.name}</span>
                     <span className="text-muted-foreground text-xs tabular-nums">{open} open</span>
                   </div>
-                  <Progress value={Math.min(100, (open / 12) * 100)} className="h-1.5" />
+                  <Progress
+                    value={Math.min(100, (open / 12) * 100)}
+                    className="bg-muted h-1.5"
+                    indicatorClassName="bg-[var(--chart-1)]"
+                  />
                 </div>
               </div>
             ))}

@@ -47,7 +47,7 @@ function ToolbarButton({
           aria-pressed={active}
           className={cn(
             "text-muted-foreground hover:bg-muted hover:text-foreground grid size-8 place-items-center rounded-md transition-colors disabled:opacity-40 [&_svg]:size-4",
-            active && "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary",
+            active && "bg-primary/35 text-brand-ink hover:bg-primary/45 hover:text-brand-ink",
           )}
         >
           {children}

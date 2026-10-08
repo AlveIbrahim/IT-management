@@ -230,7 +230,7 @@ export default function TicketDetailPage() {
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-4">
           {isClient && csatEnabled && ["resolved", "closed"].includes(ticket.status) && (
-            <Card className="border-primary/30 bg-primary/5 py-4">
+            <Card className="border-brand-ink/30 bg-primary/20 py-4">
               <CardContent className="flex flex-col gap-3 px-5 sm:flex-row sm:items-center">
                 <div className="flex-1">
                   <div className="font-medium">How did we do?</div>
@@ -324,7 +324,7 @@ export default function TicketDetailPage() {
                   onClick={() => setMode("reply")}
                   className={cn(
                     "flex items-center gap-2 border-b-2 px-4 py-2.5 text-sm font-medium transition-colors",
-                    mode === "reply" ? "border-primary text-foreground" : "text-muted-foreground border-transparent",
+                    mode === "reply" ? "border-brand-ink text-foreground" : "text-muted-foreground border-transparent",
                   )}
                 >
                   <MessageSquare className="size-4" />
@@ -491,7 +491,7 @@ export default function TicketDetailPage() {
                   {!canAssign && <p className="text-muted-foreground text-xs">Your role can&apos;t re-assign tickets.</p>}
                   {canAssign && ticket.assigneeId !== user.id && (
                     <button
-                      className="text-primary w-fit text-xs font-medium hover:underline"
+                      className="text-brand-ink w-fit text-xs font-medium hover:underline"
                       onClick={() => setField({ assigneeId: user.id }, "Assigned to you")}
                     >
                       Assign to me

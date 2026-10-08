@@ -159,7 +159,7 @@ function Editor({ item }: { item: ContentItem }) {
                       setSlugTouched(true);
                       set("slug", slugify(e.target.value));
                     }}
-                    className="text-foreground focus:border-primary min-w-0 flex-1 border-b border-dashed bg-transparent outline-none"
+                    className="text-foreground focus:border-brand-ink min-w-0 flex-1 border-b border-dashed bg-transparent outline-none"
                   />
                 </div>
               )}

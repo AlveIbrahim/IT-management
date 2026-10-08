@@ -111,7 +111,7 @@ export default function LoginPage() {
                 <Label htmlFor="password">Password</Label>
                 <button
                   type="button"
-                  className="text-primary text-xs font-medium hover:underline"
+                  className="text-brand-ink text-xs font-medium hover:underline"
                   onClick={() => toast.info("Password reset email sent", { description: "Demo only – no email is sent." })}
                 >
                   Forgot password?
@@ -149,7 +149,7 @@ export default function LoginPage() {
                     <button
                       key={a.id}
                       onClick={() => signIn(u.id)}
-                      className="hover:border-primary/50 hover:bg-accent/50 group flex items-center gap-3 rounded-lg border p-3 text-left transition-colors"
+                      className="hover:border-brand-ink/50 hover:bg-accent/50 group flex items-center gap-3 rounded-lg border p-3 text-left transition-colors"
                     >
                       <UserAvatar name={u.name} size="lg" />
                       <div className="min-w-0 flex-1">
@@ -159,7 +159,7 @@ export default function LoginPage() {
                         </div>
                         <p className="text-muted-foreground truncate text-xs">{a.hint}</p>
                       </div>
-                      <ArrowRight className="text-muted-foreground group-hover:text-primary size-4 transition-transform group-hover:translate-x-0.5" />
+                      <ArrowRight className="text-muted-foreground group-hover:text-brand-ink size-4 transition-transform group-hover:translate-x-0.5" />
                     </button>
                   );
                 })}

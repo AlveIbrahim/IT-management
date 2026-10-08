@@ -77,7 +77,7 @@ export default function CompaniesPage() {
           <Card key={s.label} className="gap-2 py-5">
             <CardHeader className="px-5">
               <CardDescription className="flex items-center gap-2 font-medium">
-                <s.icon className="text-primary size-4" />
+                <s.icon className="text-brand-ink size-4" />
                 {s.label}
               </CardDescription>
             </CardHeader>
@@ -110,7 +110,7 @@ export default function CompaniesPage() {
               <TableRow key={c.id} className="cursor-pointer" onClick={() => router.push(`/companies/${c.id}`)}>
                 <TableCell className="pl-4">
                   <div className="flex items-center gap-3">
-                    <div className="bg-primary/10 text-primary grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold">
+                    <div className="bg-primary/35 text-brand-ink grid size-9 shrink-0 place-items-center rounded-lg text-xs font-bold">
                       {c.name
                         .split(/[\s&]+/)
                         .filter(Boolean)

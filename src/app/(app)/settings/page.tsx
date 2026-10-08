@@ -21,7 +21,13 @@ import { useAppStore, useCan } from "@/lib/store";
 import type { Settings } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-const SWATCHES = ["#1d5fd1", "#0f766e", "#7c3aed", "#db2777", "#ea580c", "#16a34a", "#0891b2", "#111827"];
+const SWATCHES = ["#bdea72", "#a3e635", "#65a30d", "#15803d", "#0f766e", "#1d5fd1", "#7c3aed", "#111827"];
+
+/** Dark or white tick, whichever reads better on the swatch. */
+function tickColor(hex: string) {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b > 0.55 ? "#1a2e05" : "#ffffff";
+}
 
 export default function SettingsPage() {
   const settings = useAppStore((s) => s.settings);
@@ -88,7 +94,7 @@ export default function SettingsPage() {
                         style={{ background: c }}
                         aria-label={`Use ${c}`}
                       >
-                        {form.brandColor === c && <Check className="size-4 text-white" />}
+                        {form.brandColor === c && <Check className="size-4" style={{ color: tickColor(c) }} />}
                       </button>
                     ))}
                     <label className="relative flex h-9 items-center gap-2 rounded-md border px-2 text-sm">
@@ -140,7 +146,7 @@ export default function SettingsPage() {
             <Card className="h-fit gap-0 overflow-hidden py-0">
               <div className="text-muted-foreground border-b px-4 py-2.5 text-xs font-medium">Live preview</div>
               <div className="bg-sidebar flex items-center gap-2.5 px-4 py-4">
-                <div className="grid size-8 place-items-center rounded-lg text-white" style={{ background: form.brandColor }}>
+                <div className="bg-primary text-primary-foreground grid size-8 place-items-center rounded-lg">
                   <Headset className="size-[18px]" />
                 </div>
                 <div>
@@ -152,7 +158,7 @@ export default function SettingsPage() {
                 <div className="text-lg font-semibold">{form.portalWelcome}</div>
                 <p className="text-muted-foreground text-sm">{form.tagline}</p>
                 <div className="flex gap-2">
-                  <Button size="sm" style={{ background: form.brandColor }} className="text-white">
+                  <Button size="sm">
                     Raise a ticket
                   </Button>
                   <Button size="sm" variant="outline">
