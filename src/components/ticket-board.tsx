@@ -66,6 +66,7 @@ export function TicketBoard({ tickets }: { tickets: Ticket[] }) {
                     draggable
                     onDragStart={(e) => {
                       setDragId(t.id);
+                      e.dataTransfer.setData("text/plain", t.id);
                       e.dataTransfer.effectAllowed = "move";
                     }}
                     onDragEnd={() => {

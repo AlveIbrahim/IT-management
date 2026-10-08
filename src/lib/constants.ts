@@ -1,42 +1,59 @@
 import type { Channel, Plan, Priority, Role, TicketStatus, UserStatus } from "./types";
 
-export const STATUS_META: Record<TicketStatus, { label: string; className: string; dot: string }> = {
+/*
+ * className: soft badge · dot: small indicator · pill: solid group header (list view)
+ * · ring: the clickable status circle on each list row.
+ */
+export const STATUS_META: Record<
+  TicketStatus,
+  { label: string; className: string; dot: string; pill: string; ring: string }
+> = {
   open: {
     label: "Open",
     className: "bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/15 dark:text-blue-300 dark:border-blue-500/30",
     dot: "bg-blue-500",
+    pill: "bg-blue-600 text-white",
+    ring: "border-blue-500",
   },
   in_progress: {
     label: "In progress",
     className:
       "bg-violet-50 text-violet-700 border-violet-200 dark:bg-violet-500/15 dark:text-violet-300 dark:border-violet-500/30",
     dot: "bg-violet-500",
+    pill: "bg-violet-600 text-white",
+    ring: "border-violet-500 bg-[linear-gradient(90deg,var(--color-violet-500)_50%,transparent_50%)]",
   },
   waiting: {
     label: "Waiting on customer",
     className: "bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-500/15 dark:text-amber-300 dark:border-amber-500/30",
     dot: "bg-amber-500",
+    pill: "bg-amber-400 text-amber-950",
+    ring: "border-amber-500",
   },
   resolved: {
     label: "Resolved",
     className:
       "bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-300 dark:border-emerald-500/30",
     dot: "bg-emerald-500",
+    pill: "bg-emerald-600 text-white",
+    ring: "border-emerald-500 bg-emerald-500",
   },
   closed: {
     label: "Closed",
     className: "bg-zinc-100 text-zinc-600 border-zinc-200 dark:bg-zinc-500/15 dark:text-zinc-300 dark:border-zinc-500/30",
     dot: "bg-zinc-400",
+    pill: "bg-zinc-500 text-white",
+    ring: "border-zinc-400 bg-zinc-400",
   },
 };
 
 export const STATUS_ORDER: TicketStatus[] = ["open", "in_progress", "waiting", "resolved", "closed"];
 
-export const PRIORITY_META: Record<Priority, { label: string; className: string; weight: number }> = {
-  low: { label: "Low", className: "text-zinc-600 dark:text-zinc-300", weight: 0 },
-  medium: { label: "Medium", className: "text-sky-700 dark:text-sky-300", weight: 1 },
-  high: { label: "High", className: "text-orange-700 dark:text-orange-300", weight: 2 },
-  urgent: { label: "Urgent", className: "text-red-700 dark:text-red-300", weight: 3 },
+export const PRIORITY_META: Record<Priority, { label: string; className: string; pill: string; weight: number }> = {
+  low: { label: "Low", className: "text-zinc-600 dark:text-zinc-300", pill: "bg-zinc-500 text-white", weight: 0 },
+  medium: { label: "Medium", className: "text-sky-700 dark:text-sky-300", pill: "bg-sky-600 text-white", weight: 1 },
+  high: { label: "High", className: "text-orange-700 dark:text-orange-300", pill: "bg-orange-600 text-white", weight: 2 },
+  urgent: { label: "Urgent", className: "text-red-700 dark:text-red-300", pill: "bg-red-600 text-white", weight: 3 },
 };
 
 export const PRIORITY_ORDER: Priority[] = ["urgent", "high", "medium", "low"];

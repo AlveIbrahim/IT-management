@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
 import {
   ArrowUpDown,
   Columns3,
   Inbox,
+  Layers,
   List,
   Plus,
   Search,
@@ -18,12 +18,12 @@ import { toast } from "sonner";
 
 import { EmptyState, PageHeader } from "@/components/page-header";
 import { NewTicketDialog } from "@/components/new-ticket-dialog";
-import { PriorityBadge, SlaBadge, StatusBadge } from "@/components/ticket-badges";
+import { PriorityBadge, StatusBadge } from "@/components/ticket-badges";
 import { UserAvatar } from "@/components/user-avatar";
 import { TicketBoard } from "@/components/ticket-board";
+import { GroupedTicketList, type GroupBy } from "@/components/ticket-list";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -58,7 +58,12 @@ const VIEWS = [
 type ViewKey = (typeof VIEWS)[number]["key"];
 type SortKey = "updated" | "created" | "priority" | "due";
 
-const PAGE_SIZE = 25;
+const GROUP_LABEL: Record<GroupBy, string> = {
+  status: "Status",
+  priority: "Priority",
+  assignee: "Assignee",
+  none: "None",
+};
 
 function TicketsPageInner() {
   const user = useCurrentUser()!;
@@ -89,7 +94,7 @@ function StaffTickets() {
   const [category, setCategory] = useState<string>("all");
   const [sort, setSort] = useState<SortKey>("updated");
   const [selected, setSelected] = useState<string[]>([]);
-  const [page, setPage] = useState(1);
+  const [groupBy, setGroupBy] = useState<GroupBy>("status");
   const [newOpen, setNewOpen] = useState(false);
 
   const techs = users.filter((u) => u.role !== "client" && u.status === "active");
@@ -141,8 +146,6 @@ function StaffTickets() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets, view, layout, query, priority, assignee, company, category, sort, user.id, users, companies, now]);
 
-  const pageItems = filtered.slice(0, page * PAGE_SIZE);
-  const allSelected = pageItems.length > 0 && pageItems.every((t) => selected.includes(t.id));
   const hasFilters = query || priority !== "all" || assignee !== "all" || company !== "all" || category !== "all";
 
   const clearFilters = () => {
@@ -156,7 +159,6 @@ function StaffTickets() {
   const changeView = (v: ViewKey) => {
     setView(v);
     setSelected([]);
-    setPage(1);
     router.replace(v === "open" ? "/tickets" : `/tickets?view=${v}`, { scroll: false });
   };
 
@@ -199,14 +201,11 @@ function StaffTickets() {
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-full sm:w-72">
+        <div className="relative w-full sm:w-64">
           <Search className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2" />
           <Input
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-              setPage(1);
-            }}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by subject, ref, client…"
             className="pl-9"
           />
@@ -271,32 +270,52 @@ function StaffTickets() {
           </Button>
         )}
         {layout === "list" && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm" className="ml-auto">
-                <ArrowUpDown />
-                Sort
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
-              <DropdownMenuRadioGroup value={sort} onValueChange={(v) => setSort(v as SortKey)}>
-                <DropdownMenuRadioItem value="updated">Last updated</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="created">Newest first</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="priority">Priority</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="due">Due soonest</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div className="ml-auto flex items-center gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Layers />
+                  Group: {GROUP_LABEL[groupBy]}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Group by</DropdownMenuLabel>
+                <DropdownMenuRadioGroup value={groupBy} onValueChange={(v) => setGroupBy(v as GroupBy)}>
+                  {(Object.keys(GROUP_LABEL) as GroupBy[]).map((g) => (
+                    <DropdownMenuRadioItem key={g} value={g}>
+                      {GROUP_LABEL[g]}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <ArrowUpDown />
+                  Sort
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+                <DropdownMenuRadioGroup value={sort} onValueChange={(v) => setSort(v as SortKey)}>
+                  <DropdownMenuRadioItem value="updated">Last updated</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="created">Newest first</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="priority">Priority</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="due">Due soonest</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         )}
       </div>
 
       {layout === "board" ? (
         <TicketBoard tickets={filtered} />
       ) : (
-        <Card className="gap-0 overflow-hidden py-0">
+        <div className="space-y-4">
           {selected.length > 0 && (
-            <div className="bg-primary/20 flex flex-wrap items-center gap-2 border-b px-4 py-2">
+            <div className="bg-card sticky top-[72px] z-10 flex flex-wrap items-center gap-2 rounded-xl border px-4 py-2 shadow-md">
               <span className="text-sm font-medium">{selected.length} selected</span>
               {canAssign && (
                 <DropdownMenu>
@@ -386,104 +405,33 @@ function StaffTickets() {
               </Button>
             </div>
           )}
-          <Table>
-            <TableHeader className="bg-muted/40">
-              <TableRow>
-                <TableHead className="w-10 pl-4">
-                  <Checkbox
-                    checked={allSelected}
-                    onCheckedChange={(c) => setSelected(c ? pageItems.map((t) => t.id) : [])}
-                    aria-label="Select all"
-                  />
-                </TableHead>
-                <TableHead className="w-24">Ref</TableHead>
-                <TableHead>Subject</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Priority</TableHead>
-                <TableHead>Assignee</TableHead>
-                <TableHead>SLA</TableHead>
-                <TableHead className="pr-4 text-right">Updated</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {pageItems.map((t) => (
-                <TableRow
-                  key={t.id}
-                  data-state={selected.includes(t.id) ? "selected" : undefined}
-                  className="cursor-pointer"
-                  onClick={() => router.push(`/tickets/${t.id}`)}
-                >
-                  <TableCell className="pl-4" onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={selected.includes(t.id)}
-                      onCheckedChange={(c) => setSelected((s) => (c ? [...s, t.id] : s.filter((x) => x !== t.id)))}
-                      aria-label={`Select ${ticketRef(t.number)}`}
-                    />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground font-mono text-xs">{ticketRef(t.number)}</TableCell>
-                  <TableCell className="max-w-[320px]">
-                    <Link
-                      href={`/tickets/${t.id}`}
-                      className="block truncate font-medium hover:underline"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      {t.subject}
-                    </Link>
-                    <div className="text-muted-foreground truncate text-xs">
-                      {userName(t.requesterId)} · {companyName(t.companyId)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <StatusBadge status={t.status} />
-                  </TableCell>
-                  <TableCell>
-                    <PriorityBadge priority={t.priority} />
-                  </TableCell>
-                  <TableCell>
-                    {t.assigneeId ? (
-                      <div className="flex items-center gap-2">
-                        <UserAvatar name={userName(t.assigneeId)} size="sm" />
-                        <span className="text-sm">{userName(t.assigneeId)}</span>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground text-sm italic">Unassigned</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <SlaBadge ticket={t} />
-                  </TableCell>
-                  <TableCell className="text-muted-foreground pr-4 text-right text-xs">{timeAgo(t.updatedAt)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          {filtered.length === 0 && (
-            <EmptyState
-              icon={Inbox}
-              title="No tickets match"
-              description="Try a different view or clear your filters."
-              action={
-                hasFilters ? (
-                  <Button variant="outline" size="sm" onClick={clearFilters}>
-                    Clear filters
-                  </Button>
-                ) : undefined
-              }
+          {filtered.length === 0 ? (
+            <Card className="py-0">
+              <EmptyState
+                icon={Inbox}
+                title="No tickets match"
+                description="Try a different view or clear your filters."
+                action={
+                  hasFilters ? (
+                    <Button variant="outline" size="sm" onClick={clearFilters}>
+                      Clear filters
+                    </Button>
+                  ) : undefined
+                }
+              />
+            </Card>
+          ) : (
+            <GroupedTicketList
+              key={`${view}-${groupBy}`}
+              tickets={filtered}
+              groupBy={groupBy}
+              selected={selected}
+              onSelectedChange={setSelected}
+              defaultCollapsed={view === "all" ? ["closed"] : []}
+              onNewTicket={() => setNewOpen(true)}
             />
           )}
-          {filtered.length > 0 && (
-            <div className="text-muted-foreground flex items-center justify-between border-t px-4 py-3 text-xs">
-              <span>
-                Showing {pageItems.length} of {filtered.length} tickets
-              </span>
-              {pageItems.length < filtered.length && (
-                <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)}>
-                  Load more
-                </Button>
-              )}
-            </div>
-          )}
-        </Card>
+        </div>
       )}
 
       <NewTicketDialog open={newOpen} onOpenChange={setNewOpen} />
