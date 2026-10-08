@@ -14,6 +14,7 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-brand-ink: var(--brand-ink);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
@@ -50,78 +51,89 @@
  * --brand is the single brand colour. It is overridden at runtime from
  * Settings → Branding (see components/brand-style.tsx), so the demo can be
  * re-themed to match the client's identity without touching code.
+ *
+ * Everything else derives from it with relative colour syntax, so any brand
+ * colour stays readable:
+ *   --primary-foreground  dark text on light brands, white text on dark ones
+ *   --brand-ink           the brand darkened enough to use as text and lines
+ *   --sidebar             a deep shade of the brand's hue
  */
 :root {
-  --brand: #1d5fd1;
+  --brand: #bdea72;
+  --brand-ink: oklch(from var(--brand) min(l, 0.47) c h);
   --radius: 0.625rem;
-  --background: oklch(0.985 0.002 247);
-  --foreground: oklch(0.18 0.02 260);
+  --background: oklch(0.985 0.004 130);
+  --foreground: oklch(0.19 0.02 140);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.02 260);
+  --card-foreground: oklch(0.19 0.02 140);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.02 260);
+  --popover-foreground: oklch(0.19 0.02 140);
   --primary: var(--brand);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.965 0.006 255);
-  --secondary-foreground: oklch(0.25 0.02 260);
-  --muted: oklch(0.965 0.006 255);
-  --muted-foreground: oklch(0.52 0.02 260);
-  --accent: color-mix(in oklch, var(--brand) 9%, white);
-  --accent-foreground: oklch(0.25 0.03 260);
+  --primary-foreground: oklch(from var(--brand) clamp(0.2, (0.72 - l) * 100, 0.99) min(c, 0.05) h);
+  --secondary: oklch(0.964 0.008 130);
+  --secondary-foreground: oklch(0.25 0.02 140);
+  --muted: oklch(0.964 0.008 130);
+  --muted-foreground: oklch(0.5 0.02 140);
+  --accent: color-mix(in oklch, var(--brand) 20%, white);
+  --accent-foreground: oklch(0.25 0.03 140);
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(0.6 0.15 155);
   --warning: oklch(0.75 0.16 70);
   --info: oklch(0.6 0.15 245);
-  --border: oklch(0.92 0.006 255);
-  --input: oklch(0.92 0.006 255);
-  --ring: color-mix(in oklch, var(--brand) 60%, white);
-  --chart-1: #2a78d6;
-  --chart-2: #eb6834;
-  --chart-3: #1baf7a;
-  --chart-4: #eda100;
-  --chart-5: #e87ba4;
-  --chart-grid: #e8e7e3;
-  --sidebar: oklch(0.2 0.03 262);
-  --sidebar-foreground: oklch(0.88 0.01 260);
+  --border: oklch(0.92 0.01 130);
+  --input: oklch(0.92 0.01 130);
+  --ring: var(--brand-ink);
+  /* Chart series: brand green + blue (validated colour-blind safe as a pair). */
+  --chart-1: #5c9a16;
+  --chart-2: #2a78d6;
+  --chart-3: #eda100;
+  --chart-4: #e87ba4;
+  --chart-5: #4a3aa7;
+  --chart-grid: #e6e9e3;
+  --sidebar: oklch(from var(--brand) 0.2 min(c, 0.04) h);
+  --sidebar-foreground: oklch(0.9 0.015 130);
   --sidebar-primary: var(--brand);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.27 0.035 262);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(from var(--brand) 0.27 min(c, 0.05) h);
   --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.3 0.03 262);
+  --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: var(--brand);
 }
 
 .dark {
-  --background: oklch(0.16 0.012 262);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.205 0.014 262);
-  --card-foreground: oklch(0.96 0.005 260);
-  --popover: oklch(0.22 0.014 262);
-  --popover-foreground: oklch(0.96 0.005 260);
-  --primary: color-mix(in oklch, var(--brand) 85%, white);
-  --primary-foreground: oklch(0.15 0.01 260);
-  --secondary: oklch(0.27 0.015 262);
-  --secondary-foreground: oklch(0.96 0.005 260);
-  --muted: oklch(0.26 0.014 262);
-  --muted-foreground: oklch(0.7 0.015 260);
-  --accent: color-mix(in oklch, var(--brand) 22%, oklch(0.22 0.014 262));
-  --accent-foreground: oklch(0.96 0.005 260);
+  --brand-ink: oklch(from var(--brand) max(l, 0.8) c h);
+  --background: oklch(0.16 0.008 140);
+  --foreground: oklch(0.96 0.005 130);
+  --card: oklch(0.205 0.01 140);
+  --card-foreground: oklch(0.96 0.005 130);
+  --popover: oklch(0.22 0.01 140);
+  --popover-foreground: oklch(0.96 0.005 130);
+  --primary: oklch(from var(--brand) max(l, 0.72) c h);
+  --primary-foreground: oklch(from var(--brand) 0.2 min(c, 0.05) h);
+  --secondary: oklch(0.27 0.012 140);
+  --secondary-foreground: oklch(0.96 0.005 130);
+  --muted: oklch(0.26 0.01 140);
+  --muted-foreground: oklch(0.7 0.012 130);
+  --accent: color-mix(in oklch, var(--brand) 18%, oklch(0.22 0.01 140));
+  --accent-foreground: oklch(0.96 0.005 130);
   --destructive: oklch(0.68 0.19 22);
   --success: oklch(0.7 0.15 155);
   --warning: oklch(0.8 0.15 75);
   --info: oklch(0.7 0.13 245);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 14%);
-  --ring: color-mix(in oklch, var(--brand) 70%, black);
-  --chart-1: #3987e5;
-  --chart-2: #d95926;
-  --chart-3: #199e70;
-  --chart-4: #c98500;
-  --chart-5: #d55181;
-  --chart-grid: #2f2f2c;
-  --sidebar: oklch(0.13 0.012 262);
-  --sidebar-foreground: oklch(0.88 0.01 260);
-  --sidebar-accent: oklch(0.22 0.016 262);
+  --ring: var(--brand-ink);
+  --chart-1: #6aa32e;
+  --chart-2: #3987e5;
+  --chart-3: #c98500;
+  --chart-4: #d55181;
+  --chart-5: #9085e9;
+  --chart-grid: #2c302a;
+  --sidebar: oklch(from var(--brand) 0.15 min(c, 0.03) h);
+  --sidebar-foreground: oklch(0.88 0.01 130);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: oklch(from var(--brand) 0.22 min(c, 0.04) h);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 8%);
 }

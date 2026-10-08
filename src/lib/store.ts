@@ -4,7 +4,7 @@ import { useSyncExternalStore } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { createSeed, type SeedData } from "./seed";
+import { createSeed, DEFAULT_SETTINGS, type SeedData } from "./seed";
 import { PRIORITY_META, STATUS_META } from "./constants";
 import type { Company, ContentItem, Role, Settings, Ticket, User } from "./types";
 import { uid } from "./utils";
@@ -271,8 +271,16 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "desksupport-demo",
-      version: 1,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
+      // v2 switched the default brand from blue to DeskSupport green; move browsers still on the old default.
+      migrate: (persisted, version) => {
+        const state = persisted as Partial<AppState>;
+        if (version < 2 && state.settings?.brandColor === "#1d5fd1") {
+          state.settings = { ...state.settings, brandColor: DEFAULT_SETTINGS.brandColor };
+        }
+        return state as AppState;
+      },
     },
   ),
 );

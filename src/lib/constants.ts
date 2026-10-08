@@ -52,7 +52,7 @@ export const ROLE_META: Record<Role, { label: string; description: string; class
   admin: {
     label: "Administrator",
     description: "Full access to every client, ticket, user, the CMS and settings.",
-    className: "bg-primary/10 text-primary border-primary/20",
+    className: "bg-primary/35 text-brand-ink border-brand-ink/20",
   },
   technician: {
     label: "Technician",
@@ -85,7 +85,7 @@ export const USER_STATUS_META: Record<UserStatus, { label: string; className: st
 export const PLAN_META: Record<Plan, { className: string; price: number }> = {
   Essentials: { className: "bg-zinc-100 text-zinc-700 border-zinc-200 dark:bg-zinc-500/15 dark:text-zinc-300", price: 35 },
   Business: { className: "bg-sky-50 text-sky-700 border-sky-200 dark:bg-sky-500/15 dark:text-sky-300", price: 55 },
-  Enterprise: { className: "bg-primary/10 text-primary border-primary/20", price: 85 },
+  Enterprise: { className: "bg-primary/35 text-brand-ink border-brand-ink/20", price: 85 },
 };
 
 export const DEFAULT_CATEGORIES = [

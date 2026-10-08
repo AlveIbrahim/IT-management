@@ -296,7 +296,7 @@ function StaffTickets() {
       ) : (
         <Card className="gap-0 overflow-hidden py-0">
           {selected.length > 0 && (
-            <div className="bg-primary/5 flex flex-wrap items-center gap-2 border-b px-4 py-2">
+            <div className="bg-primary/20 flex flex-wrap items-center gap-2 border-b px-4 py-2">
               <span className="text-sm font-medium">{selected.length} selected</span>
               {canAssign && (
                 <DropdownMenu>

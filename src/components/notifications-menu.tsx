@@ -31,7 +31,7 @@ export function NotificationsMenu() {
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="text-sm font-semibold">Notifications</div>
           {unread > 0 && (
-            <button onClick={markRead} className="text-primary text-xs font-medium hover:underline">
+            <button onClick={markRead} className="text-brand-ink text-xs font-medium hover:underline">
               Mark all as read
             </button>
           )}
@@ -41,7 +41,7 @@ export function NotificationsMenu() {
             <Link
               key={n.id}
               href={n.href}
-              className={cn("hover:bg-muted/60 flex gap-3 border-b px-4 py-3 last:border-0", !n.read && "bg-primary/[0.04]")}
+              className={cn("hover:bg-muted/60 flex gap-3 border-b px-4 py-3 last:border-0", !n.read && "bg-primary/15")}
             >
               <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.read ? "bg-transparent" : "bg-primary")} />
               <div className="min-w-0">

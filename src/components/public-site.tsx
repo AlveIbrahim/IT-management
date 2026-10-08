@@ -87,7 +87,7 @@ export function PublicSite({ slug }: { slug: string }) {
               <h1 className="text-4xl leading-tight font-semibold tracking-tight sm:text-5xl">{settings.tagline}</h1>
               <p className="max-w-xl text-lg text-white/70">{page?.excerpt}</p>
               <div className="flex flex-wrap gap-3">
-                <Button asChild size="lg" className="bg-white text-zinc-900 hover:bg-white/90">
+                <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Link href="/site/contact">
                     Get a free IT review
                     <ArrowRight />
@@ -122,7 +122,7 @@ export function PublicSite({ slug }: { slug: string }) {
       {!isHome && page && (
         <section className="bg-muted/40 border-b">
           <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-            <p className="text-primary text-sm font-medium">{settings.brandName}</p>
+            <p className="text-brand-ink text-sm font-medium">{settings.brandName}</p>
             <h1 className="mt-2 text-4xl font-semibold tracking-tight">{page.title}</h1>
             <p className="text-muted-foreground mt-3 max-w-2xl text-lg">{page.excerpt}</p>
           </div>
@@ -150,11 +150,11 @@ export function PublicSite({ slug }: { slug: string }) {
             <h2 className="text-center text-2xl font-semibold tracking-tight">What we do</h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
               {services.map((s) => (
-                <Link key={s.id} href={`/site/${s.slug}`} className="bg-card hover:border-primary/40 group space-y-3 rounded-xl border p-6 transition-colors">
-                  <CheckCircle2 className="text-primary size-6" />
+                <Link key={s.id} href={`/site/${s.slug}`} className="bg-card hover:border-brand-ink/40 group space-y-3 rounded-xl border p-6 transition-colors">
+                  <CheckCircle2 className="text-brand-ink size-6" />
                   <div className="text-lg font-semibold">{s.title}</div>
                   <p className="text-muted-foreground text-sm">{s.excerpt}</p>
-                  <span className="text-primary inline-flex items-center gap-1 text-sm font-medium">
+                  <span className="text-brand-ink inline-flex items-center gap-1 text-sm font-medium">
                     Learn more <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>

@@ -161,9 +161,9 @@ export function NewTicketDialog({ open, onOpenChange }: { open: boolean; onOpenC
             />
           </div>
           {isClient && suggestions.length > 0 && (
-            <div className="bg-primary/5 border-primary/20 rounded-lg border p-3">
+            <div className="bg-primary/20 border-brand-ink/20 rounded-lg border p-3">
               <div className="mb-2 flex items-center gap-2 text-sm font-medium">
-                <Lightbulb className="text-primary size-4" />
+                <Lightbulb className="text-brand-ink size-4" />
                 These articles might fix it right away
               </div>
               <div className="space-y-1">
@@ -172,7 +172,7 @@ export function NewTicketDialog({ open, onOpenChange }: { open: boolean; onOpenC
                     key={a.id}
                     href={`/knowledge-base/${a.slug}`}
                     onClick={() => onOpenChange(false)}
-                    className="text-primary flex items-center gap-2 text-sm hover:underline"
+                    className="text-brand-ink flex items-center gap-2 text-sm hover:underline"
                   >
                     <BookOpen className="size-3.5" />
                     {a.title}

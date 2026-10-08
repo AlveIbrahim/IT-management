@@ -48,7 +48,7 @@ export function TicketBoard({ tickets }: { tickets: Ticket[] }) {
             onDrop={() => drop(status)}
             className={cn(
               "bg-muted/40 flex min-h-[420px] flex-col rounded-xl border border-transparent p-2 transition-colors",
-              over === status && "border-primary/40 bg-primary/5 border-dashed",
+              over === status && "border-brand-ink/40 bg-primary/20 border-dashed",
             )}
           >
             <div className="flex items-center gap-2 px-2 py-2">
@@ -73,7 +73,7 @@ export function TicketBoard({ tickets }: { tickets: Ticket[] }) {
                       setOver(null);
                     }}
                     className={cn(
-                      "bg-card hover:border-primary/40 block cursor-grab space-y-2.5 rounded-lg border p-3 shadow-xs transition-all active:cursor-grabbing",
+                      "bg-card hover:border-brand-ink/40 block cursor-grab space-y-2.5 rounded-lg border p-3 shadow-xs transition-all active:cursor-grabbing",
                       dragId === t.id && "opacity-40",
                     )}
                   >

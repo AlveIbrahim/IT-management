@@ -63,23 +63,23 @@ export default function PortalHome() {
               <div className="bg-popover text-popover-foreground absolute inset-x-0 top-14 z-10 overflow-hidden rounded-xl border shadow-lg">
                 {matches.map((a) => (
                   <Link key={a.id} href={`/knowledge-base/${a.slug}`} className="hover:bg-muted flex items-center gap-3 px-4 py-3 text-sm">
-                    <BookOpen className="text-primary size-4" />
+                    <BookOpen className="text-brand-ink size-4" />
                     <span className="flex-1">{a.title}</span>
                     <ArrowRight className="text-muted-foreground size-4" />
                   </Link>
                 ))}
                 <button onClick={() => setNewOpen(true)} className="hover:bg-muted flex w-full items-center gap-3 border-t px-4 py-3 text-left text-sm">
-                  <LifeBuoy className="text-primary size-4" />
+                  <LifeBuoy className="text-brand-ink size-4" />
                   <span className="flex-1">
                     {matches.length ? "None of these? " : "No articles found. "}
-                    <span className="text-primary font-medium">Raise a ticket</span>
+                    <span className="text-brand-ink font-medium">Raise a ticket</span>
                   </span>
                 </button>
               </div>
             )}
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button onClick={() => setNewOpen(true)} className="bg-white text-zinc-900 hover:bg-white/90">
+            <Button onClick={() => setNewOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90">
               <LifeBuoy />
               Raise a ticket
             </Button>
@@ -159,7 +159,7 @@ export default function PortalHome() {
                 <div className="min-w-0 flex-1">
                   <div className="text-muted-foreground text-xs">Your account manager</div>
                   <div className="font-medium">{manager.name}</div>
-                  <a href={`mailto:${manager.email}`} className="text-primary flex items-center gap-1 truncate text-xs hover:underline">
+                  <a href={`mailto:${manager.email}`} className="text-brand-ink flex items-center gap-1 truncate text-xs hover:underline">
                     <Mail className="size-3" />
                     {manager.email}
                   </a>
@@ -193,8 +193,8 @@ export default function PortalHome() {
           </CardHeader>
           <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {popular.map((a) => (
-              <Link key={a.id} href={`/knowledge-base/${a.slug}`} className="hover:border-primary/40 flex items-start gap-3 rounded-lg border p-3 transition-colors">
-                <BookOpen className="text-primary mt-0.5 size-4 shrink-0" />
+              <Link key={a.id} href={`/knowledge-base/${a.slug}`} className="hover:border-brand-ink/40 flex items-start gap-3 rounded-lg border p-3 transition-colors">
+                <BookOpen className="text-brand-ink mt-0.5 size-4 shrink-0" />
                 <div className="min-w-0">
                   <div className="text-sm font-medium">{a.title}</div>
                   <div className="text-muted-foreground line-clamp-1 text-xs">{a.excerpt}</div>

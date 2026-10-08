@@ -31,7 +31,7 @@ function mulberry32(seed: number) {
 
 export const DEFAULT_SETTINGS: Settings = {
   brandName: "DeskSupport",
-  brandColor: "#1d5fd1",
+  brandColor: "#bdea72",
   tagline: "Friendly, fast IT support for UK businesses",
   supportEmail: "help@desksupport.co.uk",
   supportPhone: "0333 000 0000",
