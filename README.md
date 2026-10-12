@@ -73,6 +73,20 @@ Use the one-click buttons on the login screen. You can also switch user at any t
 7. **Switch back to Sarah**. The new ticket is in the queue, auto-assigned, and shows up in notifications.
 8. **Settings → Branding** → pick a colour to re-theme the whole app live.
 
+## Editing the website
+
+Pages are written as normal rich text in **Content (CMS)**, and the public site at `/site` lays them out automatically:
+
+| Write this in the editor | It becomes |
+| --- | --- |
+| The first Heading 1 and the paragraph after it | The page hero (on Home: the big headline, with its last words highlighted) |
+| A heading (H2) | A new section |
+| A bullet list where every item starts in **bold** (e.g. "**Fast response** – picked up within 30 minutes") | Feature cards (on Home: the dark "Why us" section) |
+| Any other bullet list | A checklist grid |
+| A quote | A testimonial (put the author after a dash: "Great team." – Office Manager, Bristol) |
+
+Pages with *Show in navigation* switched on appear in the menu; About, Contact and Pricing sit in the main bar and everything else goes under **Services**. The stats on the home page come from live data: the urgent SLA from Settings, satisfaction from rated tickets, and users from client seats.
+
 ## Rebranding
 
 - Name, tagline, phone, email and colour: **Settings → Branding** in the app (stored per browser).

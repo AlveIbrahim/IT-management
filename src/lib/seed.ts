@@ -434,15 +434,15 @@ const pageSeed: { title: string; slug: string; excerpt: string; body: string; st
     excerpt: "Proactive IT support and cyber security for growing UK businesses.",
     status: "published",
     showInNav: true,
-    body: `<h1>IT support that just works</h1><p>We look after the technology of small and medium-sized businesses across the UK, so you can get on with running yours. One friendly team for your helpdesk, devices, Microsoft 365, networks and cyber security.</p><h2>Why businesses choose us</h2><ul><li><strong>Fast response</strong> – urgent issues picked up within 30 minutes.</li><li><strong>Fixed monthly pricing</strong> – no surprises, no hourly bills.</li><li><strong>Proactive monitoring</strong> – we spot problems before you do.</li><li><strong>Real people</strong> – a UK-based service desk that knows your business.</li></ul><blockquote>"Since moving to DeskSupport our downtime has practically disappeared." – Office Manager, Bristol law firm</blockquote>`,
+    body: `<h1>IT support that just works</h1><p>We look after the technology of small and medium-sized businesses across the UK, so you can get on with running yours. One friendly team for your helpdesk, devices, Microsoft 365, networks and cyber security.</p><h2>Why businesses choose us</h2><p>One accountable team for your helpdesk, devices, cloud and security, with the processes and reporting to prove it.</p><ul><li><strong>Fast response</strong> – urgent issues picked up within 30 minutes.</li><li><strong>Fixed monthly pricing</strong> – no surprises, no hourly bills.</li><li><strong>Proactive monitoring</strong> – we spot problems before you do.</li><li><strong>Real people</strong> – a UK-based service desk that knows your business.</li></ul><blockquote>"Since moving to DeskSupport our downtime has practically disappeared." – Office Manager, Bristol law firm</blockquote>`,
   },
   {
     title: "Managed IT Support",
     slug: "managed-it-support",
-    excerpt: "Unlimited helpdesk, remote and onsite support on a fixed monthly fee.",
+    excerpt: "Unlimited helpdesk, remote and on-site support on a fixed monthly fee.",
     status: "published",
     showInNav: true,
-    body: `<h1>Managed IT Support</h1><p>Our managed service gives your team unlimited access to our service desk, plus proactive monitoring and maintenance of every device you own.</p><h2>What's included</h2><ul><li>Unlimited remote helpdesk support</li><li>Onsite engineer visits</li><li>24/7 monitoring and patching</li><li>New starter and leaver management</li><li>Quarterly IT strategy reviews</li></ul>`,
+    body: `<h1>Managed IT Support</h1><p>Unlimited helpdesk, proactive monitoring and on-site engineers for one fixed monthly fee, so your team can focus on the work that matters.</p><h2>What's included</h2><ul><li>Unlimited remote helpdesk support</li><li>On-site engineer visits</li><li>24/7 monitoring and patching</li><li>New starter and leaver management</li><li>Hardware and software procurement</li><li>Quarterly IT strategy reviews</li></ul><h2>How it works</h2><ul><li><strong>Raise a ticket</strong> – by phone, email or the client portal, whenever something goes wrong.</li><li><strong>We fix it fast</strong> – most issues are resolved remotely, often within the hour.</li><li><strong>We stop it coming back</strong> – root-cause fixes and monitoring prevent repeat problems.</li></ul><blockquote>"They pick up the phone, fix the problem and explain it in plain English." – Practice Manager, Leeds dental group</blockquote>`,
   },
   {
     title: "Cyber Security",
@@ -450,7 +450,7 @@ const pageSeed: { title: string; slug: string; excerpt: string; body: string; st
     excerpt: "Protect your people, devices and data from modern threats.",
     status: "published",
     showInNav: true,
-    body: `<h1>Cyber Security</h1><p>From Cyber Essentials certification to managed detection and response, we help you stay one step ahead of attackers.</p><h2>Services</h2><ul><li>Cyber Essentials &amp; Cyber Essentials Plus</li><li>Endpoint detection and response</li><li>Email filtering and phishing simulations</li><li>Security awareness training</li></ul>`,
+    body: `<h1>Cyber Security</h1><p>From Cyber Essentials to round-the-clock threat detection, we help you stay one step ahead of attackers without slowing your team down.</p><h2>Services</h2><ul><li>Cyber Essentials &amp; Cyber Essentials Plus</li><li>Endpoint detection and response</li><li>Email filtering and phishing simulations</li><li>Security awareness training</li><li>Multi-factor authentication rollout</li><li>Backup and disaster recovery</li></ul><h2>Our approach</h2><ul><li><strong>Assess</strong> – a security review that shows where you're exposed and what to fix first.</li><li><strong>Protect</strong> – layered defences across devices, email and identity.</li><li><strong>Respond</strong> – if something gets through, we contain it fast and get you back to work.</li></ul>`,
   },
   {
     title: "Cloud & Microsoft 365",
@@ -458,7 +458,7 @@ const pageSeed: { title: string; slug: string; excerpt: string; body: string; st
     excerpt: "Migrations, licensing and day-to-day management of Microsoft 365.",
     status: "published",
     showInNav: true,
-    body: `<h1>Cloud &amp; Microsoft 365</h1><p>We plan and deliver migrations to Microsoft 365, then manage your tenant so it stays secure and cost-effective.</p>`,
+    body: `<h1>Cloud &amp; Microsoft 365</h1><p>We plan and deliver migrations to Microsoft 365, then manage your tenant so it stays secure, tidy and cost-effective.</p><h2>What we do</h2><ul><li>Email and file migrations with no downtime</li><li>Teams, SharePoint and OneDrive set-up</li><li>Licence reviews to cut wasted spend</li><li>Conditional access and security baselines</li><li>Device management with Intune</li><li>Day-to-day tenant administration</li></ul><h2>Why move to the cloud?</h2><p>Work securely from anywhere, stop paying for ageing servers, and get automatic updates and backups as standard. We handle the move end to end, so your team simply logs in on Monday morning and everything is there.</p>`,
   },
   {
     title: "About Us",
@@ -466,7 +466,7 @@ const pageSeed: { title: string; slug: string; excerpt: string; body: string; st
     excerpt: "A friendly team of IT engineers who care about your business.",
     status: "published",
     showInNav: true,
-    body: `<h1>About us</h1><p>We started with a simple idea: IT support should be friendly, fast and jargon-free. Today our team supports hundreds of users across the UK.</p>`,
+    body: `<h1>About us</h1><p>We started with a simple idea: IT support should be friendly, fast and jargon-free. Today our UK-based team looks after businesses across the country.</p><h2>What we believe</h2><ul><li><strong>Plain English</strong> – no jargon, just clear advice you can act on.</li><li><strong>Proactive, not reactive</strong> – we fix problems before they reach your desk.</li><li><strong>Partners, not suppliers</strong> – we learn how your business works and plan your IT around it.</li></ul><h2>Our team</h2><p>Our service desk analysts, field engineers and security specialists work as one team, so you always speak to someone who knows your setup.</p>`,
   },
   {
     title: "Contact",
@@ -474,7 +474,7 @@ const pageSeed: { title: string; slug: string; excerpt: string; body: string; st
     excerpt: "Get in touch with our team.",
     status: "published",
     showInNav: true,
-    body: `<h1>Contact us</h1><p>Existing clients can raise a ticket through the client portal or call the service desk. For new enquiries, drop us an email and we'll be in touch within one working day.</p>`,
+    body: `<h1>Contact us</h1><p>Existing clients can raise a ticket through the client portal or call the service desk. For new enquiries, send us a message and we'll reply within one working day.</p>`,
   },
   {
     title: "Pricing",

@@ -271,13 +271,21 @@ export const useAppStore = create<AppState>()(
     }),
     {
       name: "desksupport-demo",
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => localStorage),
-      // v2 switched the default brand from blue to DeskSupport green; move browsers still on the old default.
       migrate: (persisted, version) => {
         const state = persisted as Partial<AppState>;
+        // v2 switched the default brand from blue to DeskSupport green; move browsers still on the old default.
         if (version < 2 && state.settings?.brandColor === "#1d5fd1") {
           state.settings = { ...state.settings, brandColor: DEFAULT_SETTINGS.brandColor };
+        }
+        // v3 rewrote the sample website copy for the redesigned public site.
+        if (version < 3 && state.content) {
+          const fresh = new Map(createSeed().content.filter((c) => c.type === "page").map((c) => [c.id, c]));
+          state.content = state.content.map((c) => {
+            const seeded = fresh.get(c.id);
+            return seeded ? { ...c, body: seeded.body, excerpt: seeded.excerpt } : c;
+          });
         }
         return state as AppState;
       },
