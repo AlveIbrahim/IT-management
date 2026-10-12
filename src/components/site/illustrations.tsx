@@ -554,6 +554,127 @@ export function Avatar({ look, className }: ArtProps & { look: AvatarLook }) {
   );
 }
 
+/* ----------------------------------------------------------------- vines */
+
+type Pt = readonly [number, number];
+
+/** A smooth path through points (Catmull-Rom converted to cubic Béziers). */
+function smoothPath(pts: readonly Pt[]) {
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0]} ${p2[1]}`;
+  }
+  return d;
+}
+
+/** Leaves along a stem: at every point and halfway between, alternating sides. */
+function stemLeaves(pts: readonly Pt[], scale: number, seed: number) {
+  const spots: { p: Pt; angle: number }[] = [];
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1];
+    const b = pts[i];
+    spots.push({ p: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], angle: Math.atan2(b[1] - a[1], b[0] - a[0]) });
+    if (i < pts.length - 1) {
+      const next = pts[i + 1];
+      spots.push({ p: b, angle: Math.atan2(next[1] - a[1], next[0] - a[0]) });
+    }
+  }
+  return spots.map(({ p, angle }, k) => {
+    const n = k + seed;
+    const side = n % 2 ? 1 : -1;
+    return {
+      x: p[0],
+      y: p[1],
+      rot: (angle * 180) / Math.PI + 90 + side * 62,
+      len: (30 + (n % 3) * 9) * scale,
+      w: (10 + (n % 2) * 3) * scale,
+      fill: n % 4 === 0 ? C.lime : n % 4 === 2 ? C.leaf : C.leaf2,
+    };
+  });
+}
+
+function Bud({ x, y, r, sun = false, delay }: { x: number; y: number; r: number; sun?: boolean; delay: number }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <g className="ill-bloom" style={{ animationDelay: `${delay}ms` }}>
+        <circle r={r} fill={sun ? C.sun : C.pink} />
+        <path d={`M${-r * 0.2} ${r * 0.98} A${r} ${r} 0 0 1 ${-r} ${-r * 0.1} L${-r * 0.1} ${r * 0.1} Z`} fill={sun ? C.sunDark : C.pinkDark} />
+        <circle cx={r * 0.35} cy={-r * 0.35} r={r * 0.22} fill={C.white} opacity=".7" />
+      </g>
+    </g>
+  );
+}
+
+const VINES = {
+  right: {
+    viewBox: "0 0 540 340",
+    origin: "100% 20%",
+    stem: [[560, 70], [470, 52], [410, 78], [350, 130], [290, 150], [228, 128], [170, 150], [126, 204], [70, 226], [24, 212]],
+    branches: [
+      [[350, 130], [362, 190], [340, 246], [354, 296]],
+      [[228, 128], [214, 84], [236, 46]],
+      [[126, 204], [136, 262], [118, 312]],
+      [[470, 52], [486, 100], [474, 140]],
+    ],
+    buds: [[354, 300, 15], [236, 42, 13], [118, 316, 14], [22, 211, 12], [474, 144, 10, 1]],
+  },
+  left: {
+    viewBox: "0 0 340 320",
+    origin: "0% 92%",
+    stem: [[-20, 300], [40, 280], [90, 236], [120, 180], [170, 150], [230, 160], [280, 130], [300, 80]],
+    branches: [
+      [[120, 180], [80, 130], [96, 82]],
+      [[230, 160], [246, 214], [226, 260]],
+    ],
+    buds: [[96, 78, 13], [226, 264, 14], [300, 76, 11, 1]],
+  },
+} as const;
+
+/** A climbing vine with leaves and buds. It grows in once, then sways gently. */
+export function VineArt({ variant, className }: ArtProps & { variant: keyof typeof VINES }) {
+  const vine = VINES[variant];
+  const leaves = [
+    ...stemLeaves(vine.stem, 1, 0),
+    ...vine.branches.flatMap((branch, i) => stemLeaves(branch, 0.8, i + 1)),
+  ];
+  return (
+    <Svg viewBox={vine.viewBox} className={className}>
+      <g className="ill-sway-soft" style={{ transformOrigin: vine.origin }}>
+        <path d={smoothPath(vine.stem)} pathLength={1} className="ill-draw" stroke={C.leaf2} strokeWidth="5" fill="none" strokeLinecap="round" />
+        {vine.branches.map((branch, i) => (
+          <path
+            key={i}
+            d={smoothPath(branch)}
+            pathLength={1}
+            className="ill-draw"
+            style={{ animationDelay: `${500 + i * 150}ms` }}
+            stroke={C.leaf2}
+            strokeWidth="3.5"
+            fill="none"
+            strokeLinecap="round"
+          />
+        ))}
+        {leaves.map((leaf, i) => (
+          <g key={i} transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rot.toFixed(1)})`}>
+            <g className="ill-bloom" style={{ animationDelay: `${400 + i * 45}ms` }}>
+              <Leaf x={0} y={0} len={leaf.len} w={leaf.w} fill={leaf.fill} rib="rgba(23,56,58,.18)" />
+            </g>
+          </g>
+        ))}
+        {vine.buds.map(([x, y, r, sun], i) => (
+          <Bud key={i} x={x} y={y} r={r} sun={sun === 1} delay={1100 + i * 120} />
+        ))}
+      </g>
+    </Svg>
+  );
+}
+
 /* --------------------------------------------------------------- badges */
 
 /** Round seal with text running around the edge. */
