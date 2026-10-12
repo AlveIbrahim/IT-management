@@ -1,15 +1,15 @@
 "use client";
 
-import { useId, useMemo, useState } from "react";
-import { ClipboardCheck, LifeBuoy, Rocket, Sprout } from "lucide-react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { ArrowDown, ClipboardCheck, LifeBuoy, Rocket, Sprout } from "lucide-react";
 
 import { parsePageBody, sectionIntro } from "@/lib/site-content";
 import type { ContentItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-import { HeroLeftArt, HeroRightArt, PointerArt, SealBadge } from "./illustrations";
+import { HeroLeftArt, HeroRightArt, PointerArt, SealBadge, ServiceArt, VineArt, serviceArtKind } from "./illustrations";
 import { ArtPanel, ChevronList, CmsSections, ContactSection, Laptop, Sticker, TeamMember, featureItems } from "./sections";
-import { Container, Eyebrow, Reveal, SiteLink, headingClass, pageHref, telHref, useSiteData } from "./site-kit";
+import { Container, Eyebrow, Reveal, SiteLink, headingClass, pageHref, scrollToId, useSiteData } from "./site-kit";
 
 const STEPS = [
   {
@@ -32,43 +32,51 @@ const STEPS = [
 /* ---------------------------------------------------------------- hero */
 
 function Hero({ heading, lead }: { heading: string; lead: string }) {
-  const { settings, csat } = useSiteData();
+  const { csat } = useSiteData();
   return (
-    <section className="bg-site-deep relative overflow-hidden text-white">
-      <div className="relative mx-auto max-w-[1680px]">
-        <Container className="relative z-10 flex flex-col items-center pt-14 pb-12 text-center sm:pt-20 xl:min-h-[660px] xl:justify-center xl:py-20">
-          <h1 className={cn(headingClass.hero, "site-enter text-site-mint max-w-[15ch]")}>{heading}</h1>
-          <p
-            className="site-enter mt-7 max-w-[36rem] text-lg leading-relaxed text-pretty text-white/80 md:text-xl md:leading-relaxed"
-            style={{ animationDelay: "120ms" }}
-          >
-            {lead}
-          </p>
-          <div className="site-enter mt-10 flex flex-col items-center gap-x-6 gap-y-4 sm:flex-row" style={{ animationDelay: "220ms" }}>
-            <SiteLink href="/site/contact" size="lg">
-              Book a free IT review
-            </SiteLink>
-            <a href={telHref(settings.supportPhone)} className="text-white/75 underline-offset-4 transition-colors hover:text-white hover:underline">
-              or call {settings.supportPhone}
-            </a>
-          </div>
-        </Container>
-
-        <SealBadge
-          text="CLIENT SATISFACTION • UK SERVICE DESK • "
-          className="site-pop text-site-mint absolute top-10 right-[4%] z-20 hidden size-36 lg:grid xl:top-12 xl:right-[calc(50%-34rem)] xl:size-40"
+    <section className="bg-site-deep relative isolate flex min-h-[calc(100svh-72px)] flex-col overflow-hidden text-white lg:min-h-[calc(100svh-88px)]">
+      <Container className="relative z-10 flex flex-1 flex-col items-center justify-center pt-14 pb-10 text-center xl:pb-[17vh]">
+        <h1 className="site-enter text-site-mint max-w-[16ch] text-[clamp(3rem,9vw,8.5rem)] leading-[0.92] font-normal tracking-[-0.045em] text-balance">
+          {heading}
+        </h1>
+        <p
+          className="site-enter mt-8 max-w-2xl text-lg leading-relaxed text-pretty text-white/80 md:text-xl md:leading-relaxed"
+          style={{ animationDelay: "120ms" }}
         >
-          <span className="text-site-deep block text-center leading-none">
-            <span className="block text-[2.1rem] font-semibold tracking-[-0.04em]">{csat}%</span>
-            <span className="mt-1 block text-[11px] font-medium tracking-wide uppercase">happy clients</span>
-          </span>
-        </SealBadge>
+          {lead}
+        </p>
+        <SiteLink href="/site/contact" size="xl" className="site-enter mt-10" style={{ animationDelay: "220ms" }}>
+          Book a free IT review
+        </SiteLink>
+        <a
+          href="#services"
+          onClick={(e) => scrollToId(e, "services")}
+          className="site-enter mt-8 grid size-12 place-items-center rounded-full border border-white/40 text-white/80 transition-colors hover:bg-white/10 hover:text-white focus-visible:ring-2 focus-visible:ring-white/50 focus-visible:outline-none"
+          style={{ animationDelay: "320ms" }}
+        >
+          <ArrowDown className="size-5" />
+          <span className="sr-only">Scroll to our services</span>
+        </a>
+      </Container>
 
-        <div className="pointer-events-none grid grid-cols-2 items-end gap-3 px-3 sm:px-8 xl:absolute xl:inset-x-0 xl:bottom-0 xl:block xl:px-0">
-          <HeroLeftArt className="site-enter-left w-full max-w-[340px] justify-self-start xl:absolute xl:bottom-[-6px] xl:left-[1%] xl:w-[clamp(300px,24vw,470px)] xl:max-w-none" />
-          <HeroRightArt
-            className="site-enter-right w-full max-w-[340px] justify-self-end xl:absolute xl:right-[1%] xl:bottom-[-6px] xl:w-[clamp(300px,24vw,470px)] xl:max-w-none"
-          />
+      <SealBadge
+        text="CLIENT SATISFACTION • UK SERVICE DESK • "
+        className="site-pop text-site-mint absolute top-8 left-[3%] z-20 hidden size-32 xl:grid 2xl:size-40"
+      >
+        <span className="text-site-deep block text-center leading-none">
+          <span className="block text-[1.9rem] font-semibold tracking-[-0.04em] 2xl:text-[2.1rem]">{csat}%</span>
+          <span className="mt-1 block text-[10px] font-medium tracking-wide uppercase 2xl:text-[11px]">happy clients</span>
+        </span>
+      </SealBadge>
+
+      <div className="pointer-events-none grid grid-cols-2 items-end gap-3 px-3 sm:px-8 xl:absolute xl:inset-x-0 xl:bottom-0 xl:block xl:px-0">
+        <div className="relative w-full max-w-[340px] justify-self-start xl:absolute xl:bottom-[-6px] xl:left-[1%] xl:w-[clamp(320px,26vw,500px)] xl:max-w-none">
+          <VineArt variant="left" className="absolute bottom-[62%] left-[-6%] hidden w-[78%] xl:block" />
+          <HeroLeftArt className="site-enter-left relative w-full" />
+        </div>
+        <div className="relative w-full max-w-[340px] justify-self-end xl:absolute xl:right-[1%] xl:bottom-[-6px] xl:w-[clamp(320px,26vw,500px)] xl:max-w-none">
+          <VineArt variant="right" className="absolute right-[-4%] bottom-[64%] hidden w-full xl:block" />
+          <HeroRightArt className="site-enter-right relative w-full" />
         </div>
       </div>
     </section>
@@ -77,10 +85,34 @@ function Hero({ heading, lead }: { heading: string; lead: string }) {
 
 /* ------------------------------------------------------------ services */
 
-function ServiceTabs({ services }: { services: ContentItem[] }) {
+const DESKTOP = "(min-width: 1024px)";
+const HEADER_OFFSET = 88;
+const PANEL_TONES = ["bg-site-tint", "bg-site-sun-soft", "bg-[#d8efe8]"];
+
+function subscribeDesktop(callback: () => void) {
+  const query = window.matchMedia(DESKTOP);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
+}
+
+function useDesktop() {
+  return useSyncExternalStore(
+    subscribeDesktop,
+    () => window.matchMedia(DESKTOP).matches,
+    () => false,
+  );
+}
+
+/**
+ * On desktop the services pin in place while the page scrolls past them,
+ * bringing each one forward in turn. On smaller screens they simply stack.
+ */
+function ServiceScroller({ services }: { services: ContentItem[] }) {
+  const desktop = useDesktop();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-  const baseId = useId();
-  const current = services[Math.min(active, services.length - 1)];
+  const count = services.length;
   const highlights = useMemo(
     () =>
       services.map(
@@ -93,62 +125,114 @@ function ServiceTabs({ services }: { services: ContentItem[] }) {
     [services],
   );
 
+  useEffect(() => {
+    const track = trackRef.current;
+    const pin = pinRef.current;
+    if (!desktop || !track || !pin) return;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const travel = track.offsetHeight - pin.offsetHeight;
+      const progress = travel > 0 ? Math.min(0.999, Math.max(0, (HEADER_OFFSET - track.getBoundingClientRect().top) / travel)) : 0;
+      setActive(Math.floor(progress * count));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    schedule();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [desktop, count]);
+
+  const jumpTo = (index: number) => {
+    const track = trackRef.current;
+    const pin = pinRef.current;
+    if (!track || !pin) return;
+    const top = track.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    const travel = track.offsetHeight - pin.offsetHeight;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: top + ((index + 0.5) / count) * travel, behavior: reduce ? "auto" : "smooth" });
+  };
+
   return (
-    <section id="services" className="scroll-mt-24 py-24 lg:py-36">
-      <Container className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-6">
-          <Reveal>
-            <Eyebrow className="text-site-text">What we do</Eyebrow>
-          </Reveal>
-          <div className="mt-6">
-            {services.map((s, i) => {
-              const open = i === active;
-              return (
-                <Reveal key={s.id} delay={i * 80} className="border-site-line border-b last:border-b-0">
-                  <h3>
-                    <button
-                      type="button"
-                      id={`${baseId}-tab-${i}`}
-                      aria-expanded={open}
-                      aria-controls={`${baseId}-panel-${i}`}
-                      onClick={() => setActive(i)}
+    <section id="services" className="scroll-mt-[88px]">
+      <div ref={trackRef} className="relative" style={desktop ? { height: `calc(${count} * 70svh + 100svh - ${HEADER_OFFSET}px)` } : undefined}>
+        <div ref={pinRef} className={desktop ? "sticky top-[88px] flex h-[calc(100svh-88px)] items-center" : "py-20"}>
+          <Container className="grid w-full grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-16">
+            <div className="lg:col-span-6">
+              <Eyebrow className="text-site-text">What we do</Eyebrow>
+              <ol className="mt-6 space-y-14 lg:mt-8 lg:space-y-2">
+                {services.map((s, i) => {
+                  const open = !desktop || i === active;
+                  return (
+                    <li key={s.id}>
+                      <h3>
+                        <button
+                          type="button"
+                          onClick={() => jumpTo(i)}
+                          disabled={!desktop}
+                          aria-current={desktop && open ? "step" : undefined}
+                          className={cn(
+                            "text-left text-[2.3rem] leading-[1.05] font-normal tracking-[-0.035em] transition-colors duration-500 outline-none focus-visible:underline disabled:cursor-default sm:text-5xl lg:text-[3.4rem] xl:text-[3.9rem]",
+                            open ? "text-site-ink" : "text-site-ink/20 hover:text-site-ink/45",
+                          )}
+                        >
+                          {s.title}
+                        </button>
+                      </h3>
+                      <div
+                        inert={!open}
+                        className={cn(
+                          "grid transition-[grid-template-rows,opacity] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                        )}
+                      >
+                        <div className="overflow-hidden">
+                          <p className="text-site-text max-w-xl pt-4 text-lg leading-relaxed">{s.excerpt}</p>
+                          {highlights[i].length > 0 && (
+                            <ChevronList items={highlights[i].map((text) => ({ text }))} className="mt-6 gap-y-3" />
+                          )}
+                          <SiteLink href={pageHref(s)} size="lg" className="mt-8 mb-3">
+                            Learn more
+                          </SiteLink>
+                          {!desktop && <ArtPanel kind={`${s.slug} ${s.title}`} className={cn("mt-8", PANEL_TONES[i % PANEL_TONES.length])} />}
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+            {desktop && (
+              <div className="lg:col-span-6">
+                <div
+                  className={cn(
+                    "relative mx-auto aspect-square w-full max-w-[min(100%,calc(100svh-220px))] rounded-[2rem] transition-colors duration-700",
+                    PANEL_TONES[active % PANEL_TONES.length],
+                  )}
+                >
+                  {services.map((s, i) => (
+                    <div
+                      key={s.id}
                       className={cn(
-                        "w-full py-5 text-left text-[2rem] leading-[1.1] font-medium tracking-[-0.03em] transition-colors duration-300 outline-none focus-visible:underline sm:text-[2.6rem] lg:text-[2.9rem]",
-                        open ? "text-site-ink" : "text-site-ink/25 hover:text-site-ink/55",
+                        "absolute inset-[10%] transition-[opacity,transform] duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                        i === active ? "scale-100 opacity-100" : "scale-90 opacity-0",
                       )}
                     >
-                      {s.title}
-                    </button>
-                  </h3>
-                  <div
-                    id={`${baseId}-panel-${i}`}
-                    role="region"
-                    aria-labelledby={`${baseId}-tab-${i}`}
-                    inert={!open}
-                    className={cn(
-                      "grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
-                      open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
-                    )}
-                  >
-                    <div className="overflow-hidden">
-                      <p className="text-site-text max-w-xl pt-1 text-lg leading-relaxed">{s.excerpt}</p>
-                      {highlights[i].length > 0 && <ChevronList items={highlights[i].map((text) => ({ text }))} className="mt-6 gap-y-3" />}
-                      <SiteLink href={pageHref(s)} className="mt-8 mb-8">
-                        Learn more
-                      </SiteLink>
+                      <ServiceArt kind={serviceArtKind(`${s.slug} ${s.title}`)} className="size-full" />
                     </div>
-                  </div>
-                </Reveal>
-              );
-            })}
-          </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </Container>
         </div>
-        <Reveal delay={120} className="lg:col-span-6">
-          <div key={current?.id} className="site-swap">
-            {current && <ArtPanel kind={`${current.slug} ${current.title}`} />}
-          </div>
-        </Reveal>
-      </Container>
+      </div>
     </section>
   );
 }
@@ -207,7 +291,7 @@ function WhyUs({ title, intro, items }: { title: string; intro: string | null; i
           </Reveal>
         </div>
         <Reveal delay={150} className="relative lg:col-span-7">
-          <div className="relative mr-[-12%] ml-[16%] sm:mr-[-8%] lg:mr-[-14vw] lg:ml-[18%]">
+          <div className="relative ml-[16%] lg:ml-[18%]">
             <Laptop
               src="/site/hub-tickets.webp"
               alt={`The ${settings.brandName} service desk: every ticket grouped by status with its SLA and engineer`}
@@ -216,7 +300,7 @@ function WhyUs({ title, intro, items }: { title: string; intro: string | null; i
             <Sticker
               title={`${urgentMinutes} min!`}
               note="(urgent response time, and we mean it)"
-              className="absolute -top-[18%] right-[16%] w-[34%] max-w-60 min-w-28 sm:right-[20%] lg:-top-[22%] lg:right-[27%]"
+              className="absolute -top-[20%] -right-[2%] w-[32%] max-w-56 min-w-28 lg:-top-[24%]"
             />
           </div>
           <PointerArt className="absolute bottom-[-6%] left-[-4%] w-[38%] sm:w-[34%] lg:left-[-6%]" />
@@ -320,7 +404,7 @@ export function HomePage({ page }: { page: ContentItem }) {
   return (
     <>
       <Hero heading={parsed.heading ?? settings.tagline} lead={parsed.lead ?? page.excerpt} />
-      {services.length > 0 && <ServiceTabs services={services} />}
+      {services.length > 0 && <ServiceScroller services={services} />}
       <PortalShowcase />
       {featureSection && whyFeatures?.kind === "features" && (
         <WhyUs title={featureSection.title ?? "Why businesses choose us"} intro={why?.intro ?? null} items={whyFeatures.items} />

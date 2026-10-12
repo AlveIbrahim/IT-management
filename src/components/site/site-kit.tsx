@@ -78,6 +78,7 @@ export const siteButton = cva(
         sm: "h-10 px-5 text-[15px]",
         md: "h-12 px-7 text-base",
         lg: "h-14 px-8 text-[17px]",
+        xl: "h-16 px-10 text-xl",
       },
     },
     defaultVariants: { variant: "lime", size: "md" },
