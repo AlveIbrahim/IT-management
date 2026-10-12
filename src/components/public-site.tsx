@@ -20,7 +20,7 @@ export function PublicSite({ slug }: { slug: string }) {
   }, [mounted, page, brandName]);
 
   // Content lives in the browser (demo CMS), so render once the store has loaded.
-  if (!mounted) return <div className="bg-background min-h-svh" />;
+  if (!mounted) return <div className="bg-site-deep min-h-svh" />;
 
   return (
     <SiteShell current={slug}>

@@ -1,26 +1,15 @@
 "use client";
 
-import Link from "next/link";
-import { useMemo } from "react";
-import { ArrowRight, Check, CircleCheck, ClipboardCheck, LifeBuoy, Rocket } from "lucide-react";
+import { useId, useMemo, useState } from "react";
+import { ClipboardCheck, LifeBuoy, Rocket, Sprout } from "lucide-react";
 
 import { parsePageBody, sectionIntro } from "@/lib/site-content";
 import type { ContentItem } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
-import { HeroVisual } from "./hero-visual";
-import { CmsSectionView, CtaSection, FeatureCards, Testimonial } from "./sections";
-import {
-  Container,
-  CountUp,
-  Eyebrow,
-  Reveal,
-  SectionHeading,
-  SiteLink,
-  PageIcon,
-  pageHref,
-  scrollToId,
-  useSiteData,
-} from "./site-kit";
+import { HeroLeftArt, HeroRightArt, PointerArt, SealBadge } from "./illustrations";
+import { ArtPanel, ChevronList, CmsSections, ContactSection, Laptop, Sticker, TeamMember, featureItems } from "./sections";
+import { Container, Eyebrow, Reveal, SiteLink, headingClass, pageHref, telHref, useSiteData } from "./site-kit";
 
 const STEPS = [
   {
@@ -40,231 +29,306 @@ const STEPS = [
   },
 ];
 
-/** Splits a heading so its last words can be highlighted. */
-function splitHeading(text: string) {
-  const words = text.trim().split(/\s+/);
-  const count = words.length >= 4 ? 2 : 1;
-  return { head: words.slice(0, -count).join(" "), tail: words.slice(-count).join(" ") };
-}
+/* ---------------------------------------------------------------- hero */
 
-function ServiceCard({ page, index }: { page: ContentItem; index: number }) {
-  const parsed = useMemo(() => parsePageBody(page.body), [page.body]);
-  const highlights =
-    parsed.sections.flatMap((s) => s.blocks).find((b) => b.kind === "checklist")?.items.slice(0, 3) ?? [];
+function Hero({ heading, lead }: { heading: string; lead: string }) {
+  const { settings, csat } = useSiteData();
   return (
-    <Reveal delay={index * 90} className="h-full">
-      <Link
-        href={pageHref(page)}
-        className="group bg-card hover:border-brand-ink/25 flex h-full flex-col rounded-2xl border p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_30px_60px_-30px_rgb(0_0_0/0.3)] focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
-      >
-        <span className="bg-primary/35 text-brand-ink group-hover:bg-primary group-hover:text-primary-foreground grid size-12 place-items-center rounded-xl transition-colors duration-300">
-          <PageIcon slug={page.slug} className="size-6" />
-        </span>
-        <h3 className="font-display mt-7 text-xl font-semibold tracking-tight">{page.title}</h3>
-        <p className="text-muted-foreground mt-2.5 text-[15px] leading-relaxed">{page.excerpt}</p>
-        {highlights.length > 0 && (
-          <ul className="mt-6 space-y-2.5 border-t pt-6 text-sm">
-            {highlights.map((h) => (
-              <li key={h} className="flex items-start gap-2.5">
-                <Check className="text-brand-ink mt-0.5 size-4 shrink-0" strokeWidth={2.5} />
-                {h}
-              </li>
-            ))}
-          </ul>
-        )}
-        <span className="mt-auto inline-flex items-center gap-1.5 pt-8 text-sm font-semibold">
-          Learn more
-          <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </span>
-      </Link>
-    </Reveal>
+    <section className="bg-site-deep relative overflow-hidden text-white">
+      <div className="relative mx-auto max-w-[1680px]">
+        <Container className="relative z-10 flex flex-col items-center pt-14 pb-12 text-center sm:pt-20 xl:min-h-[660px] xl:justify-center xl:py-20">
+          <h1 className={cn(headingClass.hero, "site-enter text-site-mint max-w-[15ch]")}>{heading}</h1>
+          <p
+            className="site-enter mt-7 max-w-[36rem] text-lg leading-relaxed text-pretty text-white/80 md:text-xl md:leading-relaxed"
+            style={{ animationDelay: "120ms" }}
+          >
+            {lead}
+          </p>
+          <div className="site-enter mt-10 flex flex-col items-center gap-x-6 gap-y-4 sm:flex-row" style={{ animationDelay: "220ms" }}>
+            <SiteLink href="/site/contact" size="lg">
+              Book a free IT review
+            </SiteLink>
+            <a href={telHref(settings.supportPhone)} className="text-white/75 underline-offset-4 transition-colors hover:text-white hover:underline">
+              or call {settings.supportPhone}
+            </a>
+          </div>
+        </Container>
+
+        <SealBadge
+          text="CLIENT SATISFACTION • UK SERVICE DESK • "
+          className="site-pop text-site-mint absolute top-10 right-[4%] z-20 hidden size-36 lg:grid xl:top-12 xl:right-[calc(50%-34rem)] xl:size-40"
+        >
+          <span className="text-site-deep block text-center leading-none">
+            <span className="block text-[2.1rem] font-semibold tracking-[-0.04em]">{csat}%</span>
+            <span className="mt-1 block text-[11px] font-medium tracking-wide uppercase">happy clients</span>
+          </span>
+        </SealBadge>
+
+        <div className="pointer-events-none grid grid-cols-2 items-end gap-3 px-3 sm:px-8 xl:absolute xl:inset-x-0 xl:bottom-0 xl:block xl:px-0">
+          <HeroLeftArt className="site-enter-left w-full max-w-[340px] justify-self-start xl:absolute xl:bottom-[-6px] xl:left-[1%] xl:w-[clamp(300px,24vw,470px)] xl:max-w-none" />
+          <HeroRightArt
+            className="site-enter-right w-full max-w-[340px] justify-self-end xl:absolute xl:right-[1%] xl:bottom-[-6px] xl:w-[clamp(300px,24vw,470px)] xl:max-w-none"
+          />
+        </div>
+      </div>
+    </section>
   );
 }
 
+/* ------------------------------------------------------------ services */
+
+function ServiceTabs({ services }: { services: ContentItem[] }) {
+  const [active, setActive] = useState(0);
+  const baseId = useId();
+  const current = services[Math.min(active, services.length - 1)];
+  const highlights = useMemo(
+    () =>
+      services.map(
+        (s) =>
+          parsePageBody(s.body)
+            .sections.flatMap((x) => x.blocks)
+            .find((b) => b.kind === "checklist")
+            ?.items.slice(0, 3) ?? [],
+      ),
+    [services],
+  );
+
+  return (
+    <section id="services" className="scroll-mt-24 py-24 lg:py-36">
+      <Container className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-16">
+        <div className="lg:col-span-6">
+          <Reveal>
+            <Eyebrow className="text-site-text">What we do</Eyebrow>
+          </Reveal>
+          <div className="mt-6">
+            {services.map((s, i) => {
+              const open = i === active;
+              return (
+                <Reveal key={s.id} delay={i * 80} className="border-site-line border-b last:border-b-0">
+                  <h3>
+                    <button
+                      type="button"
+                      id={`${baseId}-tab-${i}`}
+                      aria-expanded={open}
+                      aria-controls={`${baseId}-panel-${i}`}
+                      onClick={() => setActive(i)}
+                      className={cn(
+                        "w-full py-5 text-left text-[2rem] leading-[1.1] font-medium tracking-[-0.03em] transition-colors duration-300 outline-none focus-visible:underline sm:text-[2.6rem] lg:text-[2.9rem]",
+                        open ? "text-site-ink" : "text-site-ink/25 hover:text-site-ink/55",
+                      )}
+                    >
+                      {s.title}
+                    </button>
+                  </h3>
+                  <div
+                    id={`${baseId}-panel-${i}`}
+                    role="region"
+                    aria-labelledby={`${baseId}-tab-${i}`}
+                    inert={!open}
+                    className={cn(
+                      "grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+                      open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0",
+                    )}
+                  >
+                    <div className="overflow-hidden">
+                      <p className="text-site-text max-w-xl pt-1 text-lg leading-relaxed">{s.excerpt}</p>
+                      {highlights[i].length > 0 && <ChevronList items={highlights[i].map((text) => ({ text }))} className="mt-6 gap-y-3" />}
+                      <SiteLink href={pageHref(s)} className="mt-8 mb-8">
+                        Learn more
+                      </SiteLink>
+                    </div>
+                  </div>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+        <Reveal delay={120} className="lg:col-span-6">
+          <div key={current?.id} className="site-swap">
+            {current && <ArtPanel kind={`${current.slug} ${current.title}`} />}
+          </div>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------- portal */
+
+function PortalShowcase() {
+  const { settings } = useSiteData();
+  return (
+    <section className="pb-24 lg:pb-36">
+      <Container className="grid grid-cols-1 items-center gap-14 lg:grid-cols-12 lg:gap-20">
+        <Reveal className="lg:col-span-7">
+          <div className="bg-site-tint relative aspect-[6/5] overflow-hidden rounded-[2rem]">
+            <Laptop
+              variant="screen"
+              src="/site/portal-home.webp"
+              alt={`The ${settings.brandName} client portal: open tickets, account manager and response times`}
+              sizes="(min-width: 1024px) 70vw, 140vw"
+              className="absolute top-[15%] left-[13%] w-[138%]"
+            />
+          </div>
+        </Reveal>
+        <Reveal delay={120} className="lg:col-span-5">
+          <Eyebrow>{settings.brandName} client portal</Eyebrow>
+          <h2 className={cn(headingClass.section, "mt-4")}>IT support without blind spots</h2>
+          <p className="text-site-text mt-8 text-lg leading-relaxed">
+            Every request, update and fix in one place. With the <strong className="text-site-ink font-semibold">{settings.brandName} Client Portal</strong> you don&apos;t just hear that it&apos;s being handled: you see who&apos;s on it, what&apos;s been done and when it&apos;ll be fixed.
+          </p>
+          <SiteLink href="/login" className="mt-10">
+            See the client portal
+          </SiteLink>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* -------------------------------------------------------------- why us */
+
+function WhyUs({ title, intro, items }: { title: string; intro: string | null; items: { title: string; text: string }[] }) {
+  const { settings, urgentMinutes } = useSiteData();
+  return (
+    <section className="bg-site-deep overflow-hidden py-24 text-white lg:py-36">
+      <Container className="grid grid-cols-1 items-center gap-16 lg:grid-cols-12 lg:gap-10">
+        <div className="lg:col-span-5">
+          <Reveal>
+            <Eyebrow className="text-white">Why {settings.brandName}</Eyebrow>
+            <h2 className={cn(headingClass.section, "text-site-mint mt-4")}>{title}</h2>
+            {intro && <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/75">{intro}</p>}
+          </Reveal>
+          <ChevronList tone="dark" items={featureItems(items)} className="mt-10" />
+          <Reveal>
+            <SiteLink href="/site/about" className="mt-12">
+              More about us
+            </SiteLink>
+          </Reveal>
+        </div>
+        <Reveal delay={150} className="relative lg:col-span-7">
+          <div className="relative mr-[-12%] ml-[16%] sm:mr-[-8%] lg:mr-[-14vw] lg:ml-[18%]">
+            <Laptop
+              src="/site/hub-tickets.webp"
+              alt={`The ${settings.brandName} service desk: every ticket grouped by status with its SLA and engineer`}
+              sizes="(min-width: 1024px) 60vw, 90vw"
+            />
+            <Sticker
+              title={`${urgentMinutes} min!`}
+              note="(urgent response time, and we mean it)"
+              className="absolute -top-[18%] right-[16%] w-[34%] max-w-60 min-w-28 sm:right-[20%] lg:-top-[22%] lg:right-[27%]"
+            />
+          </div>
+          <PointerArt className="absolute bottom-[-6%] left-[-4%] w-[38%] sm:w-[34%] lg:left-[-6%]" />
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* --------------------------------------------------------------- steps */
+
+function Steps() {
+  const { settings } = useSiteData();
+  return (
+    <section className="py-24 lg:py-36">
+      <Container className="max-w-4xl text-center">
+        <Reveal>
+          <span className="bg-site-tint text-site-ink mx-auto grid size-14 place-items-center rounded-full">
+            <Sprout className="size-7" strokeWidth={1.75} />
+          </span>
+          <h2 className={cn(headingClass.section, "mt-8")}>Switching to {settings.brandName} is simple</h2>
+          <p className="text-site-text mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
+            No disruption and nothing lost along the way. Just better IT from the first day, with a team that tells you what it&apos;s doing.
+          </p>
+        </Reveal>
+      </Container>
+      <Container className="mt-16 lg:mt-20">
+        <ol className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {STEPS.map((step, i) => (
+            <Reveal as="li" key={step.title} delay={i * 110} className="bg-site-soft relative rounded-[1.75rem] p-8 text-left lg:p-10">
+              <div className="flex items-center justify-between">
+                <span className="bg-primary text-primary-foreground grid size-12 place-items-center rounded-full">
+                  <step.icon className="size-6" strokeWidth={1.75} />
+                </span>
+                <span className="text-site-ink/20 text-5xl font-medium tracking-[-0.04em] tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+              </div>
+              <h3 className="mt-10 text-2xl font-medium tracking-[-0.02em]">{step.title}</h3>
+              <p className="text-site-text mt-3 text-[17px] leading-relaxed">{step.text}</p>
+            </Reveal>
+          ))}
+        </ol>
+        <Reveal className="mt-14 text-center">
+          <SiteLink href="/site/contact">Book your free IT review</SiteLink>
+        </Reveal>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------- team */
+
+function TeamSection({ quote }: { quote: { text: string; cite: string | null } | null }) {
+  const { team, pages, settings } = useSiteData();
+  const about = pages.find((p) => p.slug === "about");
+  const people = team.slice(0, 4);
+  return (
+    <section className="bg-site-deep overflow-hidden py-24 text-white lg:py-36">
+      <Container className="grid grid-cols-1 items-center gap-16 lg:grid-cols-12">
+        <Reveal className="lg:col-span-6">
+          <Eyebrow className="text-white">About us</Eyebrow>
+          <h2 className={cn(headingClass.section, "text-site-mint mt-4")}>Real people who know your business</h2>
+          <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/75">
+            {about?.excerpt ??
+              `${settings.brandName} is a UK team of engineers who'd rather prevent a problem than fix it. You'll always know who you're talking to.`}
+          </p>
+          {quote && (
+            <figure className="border-primary mt-10 max-w-xl border-l-2 pl-6">
+              <blockquote className="text-xl leading-snug md:text-2xl md:leading-snug">&ldquo;{quote.text}&rdquo;</blockquote>
+              {quote.cite && <figcaption className="mt-4 text-white/60">{quote.cite}</figcaption>}
+            </figure>
+          )}
+          {about && (
+            <SiteLink href={pageHref(about)} className="mt-12">
+              Meet the team
+            </SiteLink>
+          )}
+        </Reveal>
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:gap-x-10 lg:col-span-6 lg:pl-8">
+          {people.map((user, i) => (
+            <Reveal key={user.id} delay={i * 100} className={cn(i % 2 === 1 && "sm:translate-y-16")}>
+              <TeamMember user={user} size="lg" tone="dark" />
+            </Reveal>
+          ))}
+        </div>
+      </Container>
+    </section>
+  );
+}
+
+/* ---------------------------------------------------------------- page */
+
 export function HomePage({ page }: { page: ContentItem }) {
-  const { services, settings, csat, usersSupported, urgentMinutes } = useSiteData();
+  const { services, settings } = useSiteData();
   const parsed = useMemo(() => parsePageBody(page.body), [page.body]);
 
-  const heading = splitHeading(parsed.heading ?? settings.tagline);
-  const lead = parsed.lead ?? page.excerpt;
   const featureSection = parsed.sections.find((s) => s.blocks.some((b) => b.kind === "features"));
   const why = featureSection ? sectionIntro(featureSection) : null;
   const whyFeatures = featureSection?.blocks.find((b) => b.kind === "features");
   const otherSections = parsed.sections.filter((s) => s !== featureSection);
 
-  const stats = [
-    { value: urgentMinutes, suffix: " min", label: "Urgent response time" },
-    { value: csat, suffix: "%", label: "Customer satisfaction" },
-    { value: usersSupported, suffix: "+", label: "Users supported" },
-    { text: "24/7", label: "Proactive monitoring" },
-  ];
-
   return (
     <>
-      {/* Hero */}
-      <section className="relative isolate overflow-hidden pt-32 pb-8 md:pt-40 md:pb-12">
-        <div aria-hidden className="site-grid-bg absolute inset-0 -z-10" />
-        <div
-          aria-hidden
-          className="absolute -top-48 right-[-15%] -z-10 size-[820px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--brand)_42%,transparent),transparent)] blur-2xl dark:opacity-45"
-        />
-        <Container className="grid grid-cols-1 items-center gap-x-12 gap-y-20 lg:grid-cols-12">
-          <div className="lg:col-span-6">
-            <p className="site-enter bg-background/70 text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[13px] font-medium backdrop-blur">
-              <span className="relative flex size-2">
-                <span className="bg-brand-ink/40 absolute inline-flex size-full animate-ping rounded-full motion-reduce:hidden" />
-                <span className="bg-brand-ink relative inline-flex size-2 rounded-full" />
-              </span>
-              {settings.tagline}
-            </p>
-            <h1
-              className="site-enter font-display mt-7 text-[2.75rem] leading-[1.02] font-semibold tracking-[-0.035em] text-balance sm:text-6xl lg:text-[4.5rem]"
-              style={{ animationDelay: "80ms" }}
-            >
-              {heading.head} <span className="site-mark">{heading.tail}</span>
-            </h1>
-            <p
-              className="site-enter text-muted-foreground mt-7 max-w-xl text-lg leading-relaxed text-pretty"
-              style={{ animationDelay: "160ms" }}
-            >
-              {lead}
-            </p>
-            <div className="site-enter mt-10 flex flex-wrap gap-3 *:w-full sm:*:w-auto" style={{ animationDelay: "240ms" }}>
-              <SiteLink href="/site/contact" size="lg">
-                Get a free IT review
-                <ArrowRight />
-              </SiteLink>
-              <SiteLink href="#services" variant="outline" size="lg" onClick={(e) => scrollToId(e, "services")}>
-                Explore services
-              </SiteLink>
-            </div>
-            <ul
-              className="site-enter text-muted-foreground mt-10 flex flex-wrap gap-x-6 gap-y-3 text-sm"
-              style={{ animationDelay: "320ms" }}
-            >
-              {[`${urgentMinutes}-minute urgent response`, "Fixed monthly pricing", "UK-based service desk"].map((t) => (
-                <li key={t} className="flex items-center gap-2">
-                  <CircleCheck className="text-brand-ink size-4" />
-                  {t}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="site-enter lg:col-span-6 lg:pl-6" style={{ animationDelay: "220ms" }}>
-            <HeroVisual csat={csat} />
-          </div>
-        </Container>
-
-        <Container className="mt-24 md:mt-32">
-          <Reveal className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-2xl border lg:grid-cols-4">
-            {stats.map((s) => (
-              <div key={s.label} className="bg-background/95 px-6 py-7 backdrop-blur lg:px-8 lg:py-9">
-                <p className="font-display text-3xl font-semibold tracking-[-0.03em] md:text-[2.75rem] md:leading-none">
-                  {"text" in s ? s.text : <CountUp value={s.value} suffix={s.suffix} />}
-                </p>
-                <p className="text-muted-foreground mt-2.5 text-sm">{s.label}</p>
-              </div>
-            ))}
-          </Reveal>
-        </Container>
-      </section>
-
-      {/* Services */}
-      {services.length > 0 && (
-        <section id="services" className="scroll-mt-20 py-24 md:py-32">
-          <Container>
-            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-              <SectionHeading
-                eyebrow="Services"
-                title="Everything your IT needs, under one roof"
-                description="Pick a single service or let us run the lot. Either way, you get one accountable team."
-              />
-              <Reveal>
-                <SiteLink href="/site/contact" variant="outline">
-                  Talk to an expert
-                  <ArrowRight />
-                </SiteLink>
-              </Reveal>
-            </div>
-            <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-              {services.map((s, i) => (
-                <ServiceCard key={s.id} page={s} index={i} />
-              ))}
-            </div>
-          </Container>
-        </section>
-      )}
-
-      {/* Why us, from the CMS */}
+      <Hero heading={parsed.heading ?? settings.tagline} lead={parsed.lead ?? page.excerpt} />
+      {services.length > 0 && <ServiceTabs services={services} />}
+      <PortalShowcase />
       {featureSection && whyFeatures?.kind === "features" && (
-        <section className="bg-sidebar relative isolate overflow-clip py-24 text-white md:py-32">
-          <div aria-hidden className="site-grid-bg-dark absolute inset-0 -z-10 opacity-60" />
-          <div
-            aria-hidden
-            className="absolute top-0 -left-40 -z-10 size-[640px] rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklch,var(--brand)_24%,transparent),transparent)]"
-          />
-          <Container className="grid grid-cols-1 gap-14 lg:grid-cols-12 lg:gap-16">
-            <div className="self-start lg:sticky lg:top-32 lg:col-span-5">
-              <Reveal>
-                <Eyebrow dark>Why {settings.brandName}</Eyebrow>
-                <h2 className="font-display mt-4 text-3xl leading-[1.1] font-semibold tracking-[-0.025em] text-balance md:text-[2.75rem]">
-                  {featureSection.title ?? "Why businesses choose us"}
-                </h2>
-                {why?.intro && <p className="mt-5 text-lg leading-relaxed text-pretty text-white/70">{why.intro}</p>}
-                <SiteLink href="/site/about" variant="onDark" className="mt-9">
-                  More about us
-                  <ArrowRight />
-                </SiteLink>
-              </Reveal>
-            </div>
-            <div className="lg:col-span-7">
-              <FeatureCards items={whyFeatures.items} dark />
-            </div>
-          </Container>
-        </section>
+        <WhyUs title={featureSection.title ?? "Why businesses choose us"} intro={why?.intro ?? null} items={whyFeatures.items} />
       )}
-
-      {/* Any other sections the editor adds */}
-      {otherSections.length > 0 && (
-        <section className="py-24 md:py-32">
-          <Container className="max-w-4xl space-y-16">
-            {otherSections.map((s, i) => (
-              <CmsSectionView key={i} section={s} />
-            ))}
-          </Container>
-        </section>
-      )}
-
-      {/* How it works */}
-      <section className="py-24 md:py-32">
-        <Container>
-          <SectionHeading
-            align="center"
-            eyebrow="How it works"
-            title={`Switching to ${settings.brandName} is simple`}
-            description="No disruption, nothing lost along the way. Just better IT from day one."
-          />
-          <Reveal className="relative mt-16 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-8">
-            <div aria-hidden className="bg-border absolute top-7 right-[16.66%] left-[16.66%] hidden h-px md:block">
-              <div className="site-line bg-brand-ink/50 h-full" />
-            </div>
-            {STEPS.map((step, i) => (
-              <div key={step.title} className="relative text-center">
-                <span className="bg-primary text-primary-foreground ring-background relative z-10 mx-auto grid size-14 place-items-center rounded-full shadow-sm ring-8">
-                  <step.icon className="size-6" />
-                </span>
-                <p className="text-brand-ink font-display mt-6 text-sm font-semibold tabular-nums">Step {i + 1}</p>
-                <h3 className="font-display mt-1.5 text-xl font-semibold tracking-tight">{step.title}</h3>
-                <p className="text-muted-foreground mx-auto mt-3 max-w-xs leading-relaxed">{step.text}</p>
-              </div>
-            ))}
-          </Reveal>
-        </Container>
-      </section>
-
-      {parsed.quote && <Testimonial quote={parsed.quote} />}
-
-      <CtaSection />
+      <CmsSections sections={otherSections} />
+      <Steps />
+      <TeamSection quote={parsed.quote} />
+      <ContactSection />
     </>
   );
 }

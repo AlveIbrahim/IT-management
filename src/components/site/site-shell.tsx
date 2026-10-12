@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import { useState, useSyncExternalStore } from "react";
-import { ArrowRight, ChevronDown, Clock, Mail, Menu, Phone } from "lucide-react";
+import { ArrowUpRight, ChevronDown, Headset, Menu, X } from "lucide-react";
 
-import { Logo } from "@/components/logo";
-import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
-import { Container, PageIcon, SiteLink, pageHref, useSiteData } from "./site-kit";
+import { ServiceArt, serviceArtKind } from "./illustrations";
+import { Container, SiteLink, pageHref, telHref, useSiteData } from "./site-kit";
 
 function subscribeScroll(callback: () => void) {
   window.addEventListener("scroll", callback, { passive: true });
@@ -20,153 +19,148 @@ function subscribeScroll(callback: () => void) {
 function useScrolled() {
   return useSyncExternalStore(
     subscribeScroll,
-    () => window.scrollY > 12,
+    () => window.scrollY > 8,
     () => false,
   );
 }
 
+export function SiteLogo({ className }: { className?: string }) {
+  const { settings } = useSiteData();
+  return (
+    <span className={cn("flex items-center gap-3", className)}>
+      <span className="bg-primary text-primary-foreground grid size-10 place-items-center rounded-xl">
+        <Headset className="size-[22px]" />
+      </span>
+      <span className="text-[21px] font-medium tracking-[-0.02em] text-white">{settings.brandName}</span>
+    </span>
+  );
+}
+
 const navLink =
-  "relative rounded-full px-4 py-2 text-sm font-medium transition-colors duration-200 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 after:absolute after:inset-x-4 after:-bottom-px after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-ink after:transition-transform after:duration-300 hover:text-foreground hover:after:scale-x-100";
+  "relative inline-flex h-11 items-center gap-1.5 rounded-full px-4 text-[16px] text-white/80 transition-colors duration-200 outline-none hover:text-white focus-visible:ring-2 focus-visible:ring-white/50 data-[current=true]:text-white after:absolute after:inset-x-4 after:bottom-1.5 after:h-0.5 after:rounded-full after:bg-primary after:opacity-0 after:transition-opacity data-[current=true]:after:opacity-100";
 
 function SiteHeader({ current }: { current: string }) {
   const scrolled = useScrolled();
   const { services, company, settings } = useSiteData();
   const [menuOpen, setMenuOpen] = useState(false);
+  const links = company.filter((p) => p.slug !== "contact");
   const onService = services.some((s) => s.slug === current);
-  const tel = `tel:${settings.supportPhone.replace(/\s/g, "")}`;
 
   return (
     <header
       className={cn(
-        "fixed inset-x-0 top-0 z-50 border-b transition-[background-color,border-color,box-shadow] duration-300",
-        scrolled
-          ? "bg-background/80 border-border shadow-[0_10px_30px_-18px_rgb(0_0_0/0.25)] backdrop-blur-xl"
-          : "border-transparent bg-transparent",
+        "bg-site-deep sticky top-0 z-50 transition-shadow duration-300",
+        scrolled && "shadow-[0_1px_0_0_rgb(255_255_255/0.08),0_12px_30px_-20px_rgb(0_0_0/0.6)]",
       )}
     >
-      <Container className="flex h-[72px] items-center gap-6">
-        <Link href="/site" aria-label={`${settings.brandName} home`} className="rounded-lg outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50">
-          <Logo />
+      <Container className="flex h-[72px] items-center gap-4 lg:h-[88px]">
+        <Link href="/site" aria-label={`${settings.brandName} home`} className="shrink-0 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-white/50">
+          <SiteLogo />
         </Link>
 
-        <nav aria-label="Main" className="ml-4 hidden items-center lg:flex">
+        <nav aria-label="Main" className="ml-6 hidden items-center lg:flex">
           {services.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                className={cn(
-                  navLink,
-                  "group inline-flex items-center gap-1 data-[state=open]:text-foreground",
-                  onService ? "text-foreground after:scale-x-100" : "text-muted-foreground",
-                )}
-              >
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger className={cn(navLink, "group")} data-current={onService}>
                 Services
                 <ChevronDown className="size-4 transition-transform duration-200 group-data-[state=open]:rotate-180" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" sideOffset={14} className="w-[min(440px,calc(100vw-2rem))] rounded-2xl p-2 shadow-xl">
+              <DropdownMenuContent
+                align="start"
+                sideOffset={10}
+                className="w-[min(560px,calc(100vw-2rem))] rounded-3xl border-0 p-3 shadow-[0_30px_60px_-20px_rgb(0_0_0/0.45)]"
+              >
                 {services.map((s) => (
-                    <DropdownMenuItem key={s.id} asChild className="cursor-pointer items-start gap-3.5 rounded-xl p-3">
-                      <Link href={pageHref(s)}>
-                        <span className="bg-primary/35 grid size-10 shrink-0 place-items-center rounded-lg">
-                          <PageIcon slug={s.slug} className="text-brand-ink size-5" />
-                        </span>
-                        <span className="min-w-0">
-                          <span className="text-foreground block text-sm font-semibold">{s.title}</span>
-                          <span className="text-muted-foreground mt-0.5 block text-[13px] leading-snug whitespace-normal">{s.excerpt}</span>
-                        </span>
-                      </Link>
-                    </DropdownMenuItem>
+                  <DropdownMenuItem key={s.id} asChild className="font-display cursor-pointer items-center gap-4 rounded-2xl p-3">
+                    <Link href={pageHref(s)}>
+                      <span className="bg-site-sun-soft grid size-16 shrink-0 place-items-center rounded-xl p-1">
+                        <ServiceArt kind={serviceArtKind(`${s.slug} ${s.title}`)} className="size-full" />
+                      </span>
+                      <span className="min-w-0">
+                        <span className="text-site-ink block text-[17px] font-medium">{s.title}</span>
+                        <span className="text-site-text mt-0.5 block text-sm leading-snug whitespace-normal">{s.excerpt}</span>
+                      </span>
+                    </Link>
+                  </DropdownMenuItem>
                 ))}
-                <div className="bg-muted/70 mt-1 flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-[13px]">
-                  <span className="text-muted-foreground">Not sure what you need?</span>
-                  <Link href="/site/contact" className="text-brand-ink inline-flex items-center gap-1 font-semibold hover:underline">
-                    Book a free IT review
-                    <ArrowRight className="size-3.5" />
-                  </Link>
-                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {company.map((p) => (
-            <Link
-              key={p.id}
-              href={pageHref(p)}
-              aria-current={p.slug === current ? "page" : undefined}
-              className={cn(navLink, p.slug === current ? "text-foreground after:scale-x-100" : "text-muted-foreground")}
-            >
+          {links.map((p) => (
+            <Link key={p.id} href={pageHref(p)} className={navLink} data-current={p.slug === current} aria-current={p.slug === current ? "page" : undefined}>
               {p.title}
             </Link>
           ))}
         </nav>
 
-        <div className="ml-auto flex items-center gap-1.5">
-          <a
-            href={tel}
-            className="text-muted-foreground hover:text-foreground mr-2 hidden items-center gap-2 text-sm font-medium transition-colors xl:inline-flex"
-          >
-            <Phone className="size-4" />
-            {settings.supportPhone}
-          </a>
-          <SiteLink href="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
+        <div className="ml-auto flex items-center gap-2.5">
+          <SiteLink href="/login" variant="lightOutline" size="sm" className="hidden sm:inline-flex">
             Client login
           </SiteLink>
           <SiteLink href="/site/contact" size="sm" className="hidden sm:inline-flex">
-            Free IT review
-            <ArrowRight />
+            Contact us
           </SiteLink>
-          <Button variant="ghost" size="icon" className="rounded-full lg:hidden" onClick={() => setMenuOpen(true)}>
-            <Menu />
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="grid size-11 place-items-center rounded-full text-white outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50 lg:hidden"
+          >
+            <Menu className="size-6" />
             <span className="sr-only">Open menu</span>
-          </Button>
+          </button>
         </div>
       </Container>
 
       <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
-        <SheetContent side="right" className="w-full gap-0 p-0 sm:max-w-sm">
+        <SheetContent side="right" showCloseButton={false} className="bg-site-deep font-display w-full gap-0 border-0 p-0 text-white sm:max-w-md">
           <SheetTitle className="sr-only">Menu</SheetTitle>
-          <div className="flex h-[72px] items-center border-b px-6">
-            <Logo />
+          <div className="flex h-[72px] items-center justify-between px-5">
+            <SiteLogo />
+            <SheetClose className="grid size-11 place-items-center rounded-full outline-none hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/50">
+              <X className="size-6" />
+              <span className="sr-only">Close menu</span>
+            </SheetClose>
           </div>
-          <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-4 py-6">
-            <p className="text-muted-foreground px-2 pb-2 text-xs font-semibold tracking-[0.08em] uppercase">Services</p>
-            {services.map((s) => (
-                <Link
-                  key={s.id}
-                  href={pageHref(s)}
-                  onClick={() => setMenuOpen(false)}
-                  className="hover:bg-muted flex items-center gap-3 rounded-xl px-2 py-2.5 transition-colors"
-                >
-                  <span className="bg-primary/35 grid size-9 place-items-center rounded-lg">
-                    <PageIcon slug={s.slug} className="text-brand-ink size-[18px]" />
-                  </span>
-                  <span className="font-medium">{s.title}</span>
-                </Link>
-            ))}
-            <div className="my-4 border-t" />
-            {company.map((p) => (
-              <Link
-                key={p.id}
-                href={pageHref(p)}
-                onClick={() => setMenuOpen(false)}
-                className="hover:bg-muted block rounded-xl px-2 py-2.5 font-medium transition-colors"
-              >
-                {p.title}
-              </Link>
-            ))}
-          </nav>
-          <div className="space-y-3 border-t p-6">
-            <a href={tel} className="text-muted-foreground flex items-center gap-2 text-sm">
-              <Phone className="size-4" />
-              {settings.supportPhone}
-            </a>
-            <div className="grid grid-cols-2 gap-2">
-              <SiteLink href="/login" variant="outline" size="md">
+          <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-5 pt-6 pb-10">
+            <p className="text-sm text-white/50">Services</p>
+            <ul className="mt-2">
+              {services.map((s) => (
+                <li key={s.id}>
+                  <Link
+                    href={pageHref(s)}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between border-b border-white/10 py-4 text-2xl tracking-[-0.02em]"
+                  >
+                    {s.title}
+                    <ArrowUpRight className="text-primary size-5" />
+                  </Link>
+                </li>
+              ))}
+              {links.map((p) => (
+                <li key={p.id}>
+                  <Link
+                    href={pageHref(p)}
+                    onClick={() => setMenuOpen(false)}
+                    className="flex items-center justify-between border-b border-white/10 py-4 text-2xl tracking-[-0.02em]"
+                  >
+                    {p.title}
+                    <ArrowUpRight className="text-primary size-5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 grid gap-3">
+              <SiteLink href="/site/contact" size="lg" onClick={() => setMenuOpen(false)}>
+                Contact us
+              </SiteLink>
+              <SiteLink href="/login" variant="lightOutline" size="lg">
                 Client login
               </SiteLink>
-              <SiteLink href="/site/contact" size="md" onClick={() => setMenuOpen(false)}>
-                IT review
-              </SiteLink>
+              <a href={telHref(settings.supportPhone)} className="mt-4 text-center text-white/70">
+                Or call {settings.supportPhone}
+              </a>
             </div>
-          </div>
+          </nav>
         </SheetContent>
       </Sheet>
     </header>
@@ -175,39 +169,21 @@ function SiteHeader({ current }: { current: string }) {
 
 function SiteFooter() {
   const { services, company, settings } = useSiteData();
-  const tel = `tel:${settings.supportPhone.replace(/\s/g, "")}`;
-  const linkClass = "text-muted-foreground hover:text-foreground transition-colors";
+  const linkClass = "text-white/70 transition-colors hover:text-white";
 
   return (
-    <footer className="border-t">
-      <Container className="grid grid-cols-1 gap-12 py-16 md:grid-cols-12 md:py-20">
-        <div className="space-y-6 md:col-span-5">
-          <Logo />
-          <p className="text-muted-foreground max-w-sm text-[15px] leading-relaxed">
-            {settings.tagline}. Helpdesk, devices, cloud and cyber security, all looked after by one team.
-          </p>
-          <ul className="space-y-3 text-sm">
-            <li>
-              <a href={tel} className={cn(linkClass, "inline-flex items-center gap-2.5")}>
-                <Phone className="size-4" />
-                {settings.supportPhone}
-              </a>
-            </li>
-            <li>
-              <a href={`mailto:${settings.supportEmail}`} className={cn(linkClass, "inline-flex items-center gap-2.5")}>
-                <Mail className="size-4" />
-                {settings.supportEmail}
-              </a>
-            </li>
-            <li className="text-muted-foreground inline-flex items-center gap-2.5">
-              <Clock className="size-4" />
-              {settings.businessHours}
-            </li>
-          </ul>
+    <footer className="bg-site-deep font-display text-white">
+      <Container className="grid grid-cols-1 gap-12 pt-20 pb-14 sm:grid-cols-2 lg:grid-cols-12 lg:pt-24">
+        <div className="lg:col-span-4">
+          <SiteLogo />
+          <p className="mt-6 max-w-sm text-lg leading-relaxed text-white/70">{settings.tagline}.</p>
+          <SiteLink href="/site/contact" className="mt-8">
+            Book a free IT review
+          </SiteLink>
         </div>
-        <div className="md:col-span-3">
-          <h3 className="text-sm font-semibold">Services</h3>
-          <ul className="mt-4 space-y-3 text-sm">
+        <div className="lg:col-span-3">
+          <h2 className="text-site-mint text-base">Services</h2>
+          <ul className="mt-5 space-y-3">
             {services.map((s) => (
               <li key={s.id}>
                 <Link href={pageHref(s)} className={linkClass}>
@@ -217,9 +193,9 @@ function SiteFooter() {
             ))}
           </ul>
         </div>
-        <div className="md:col-span-2">
-          <h3 className="text-sm font-semibold">Company</h3>
-          <ul className="mt-4 space-y-3 text-sm">
+        <div className="lg:col-span-2">
+          <h2 className="text-site-mint text-base">Company</h2>
+          <ul className="mt-5 space-y-3">
             {company.map((p) => (
               <li key={p.id}>
                 <Link href={pageHref(p)} className={linkClass}>
@@ -227,47 +203,48 @@ function SiteFooter() {
                 </Link>
               </li>
             ))}
-          </ul>
-        </div>
-        <div className="md:col-span-2">
-          <h3 className="text-sm font-semibold">Clients</h3>
-          <ul className="mt-4 space-y-3 text-sm">
             <li>
               <Link href="/login" className={linkClass}>
                 Client portal
               </Link>
             </li>
+          </ul>
+        </div>
+        <div className="lg:col-span-3">
+          <h2 className="text-site-mint text-base">Get in touch</h2>
+          <ul className="mt-5 space-y-3">
             <li>
-              <Link href="/login" className={linkClass}>
-                Raise a ticket
-              </Link>
-            </li>
-            <li>
-              <a href={tel} className={linkClass}>
-                Call the service desk
+              <a href={telHref(settings.supportPhone)} className={linkClass}>
+                {settings.supportPhone}
               </a>
             </li>
+            <li>
+              <a href={`mailto:${settings.supportEmail}`} className={linkClass}>
+                {settings.supportEmail}
+              </a>
+            </li>
+            <li className="text-white/70">{settings.businessHours}</li>
           </ul>
         </div>
       </Container>
-      <div className="border-t">
-        <Container className="text-muted-foreground flex flex-col gap-2 py-6 text-xs sm:flex-row sm:items-center sm:justify-between">
+      <Container>
+        <div className="flex flex-col gap-3 border-t border-white/10 py-8 text-sm text-white/50 sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {settings.brandName}. All rights reserved.
           </p>
-          <p>Website content managed in the {settings.brandName} Hub CMS.</p>
-        </Container>
-      </div>
+          <p>This website is managed in the {settings.brandName} Hub CMS.</p>
+        </div>
+      </Container>
     </footer>
   );
 }
 
 export function SiteShell({ current, children }: { current: string; children: React.ReactNode }) {
   return (
-    <div className="bg-background text-foreground flex min-h-svh flex-col">
+    <div className="font-display text-site-ink flex min-h-svh flex-col bg-white">
       <a
         href="#main"
-        className="bg-primary text-primary-foreground sr-only z-[60] rounded-full px-4 py-2 text-sm font-semibold focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        className="bg-primary text-primary-foreground sr-only z-[60] rounded-full px-5 py-2.5 focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>

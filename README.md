@@ -79,13 +79,16 @@ Pages are written as normal rich text in **Content (CMS)**, and the public site 
 
 | Write this in the editor | It becomes |
 | --- | --- |
-| The first Heading 1 and the paragraph after it | The page hero (on Home: the big headline, with its last words highlighted) |
-| A heading (H2) | A new section |
-| A bullet list where every item starts in **bold** (e.g. "**Fast response** – picked up within 30 minutes") | Feature cards (on Home: the dark "Why us" section) |
-| Any other bullet list | A checklist grid |
+| The first Heading 1 and the paragraph after it | The page hero (on Home: the big centred headline between the illustrations) |
+| A heading (H2) | A new section, with the heading on the left and its content on the right |
+| A bullet list where every item starts in **bold** (e.g. "**Fast response** – picked up within 30 minutes") | On Home: the bullet list in the dark "Why us" section. On other pages: numbered steps |
+| Any other bullet list | A chevron bullet list (two columns when it has more than three items) |
 | A quote | A testimonial (put the author after a dash: "Great team." – Office Manager, Bristol) |
+| On About, a heading containing "team" or "people" | That section also shows the staff portraits from **Users & roles** |
 
-Pages with *Show in navigation* switched on appear in the menu; About, Contact and Pricing sit in the main bar and everything else goes under **Services**. The stats on the home page come from live data: the urgent SLA from Settings, satisfaction from rated tickets, and users from client seats.
+Pages with *Show in navigation* switched on appear in the menu; About, Contact and Pricing sit in the main bar and everything else goes under **Services**. Live figures come from the app: the "30 min" sticker uses the urgent SLA in Settings, the satisfaction seal uses rated tickets, and the team, account manager and "Or call us directly" contact come from active staff.
+
+The laptop mockups on the home page are real screenshots of the Hub in `public/site/` (`portal-home.webp` and `hub-tickets.webp`). Retake them if the app's look changes. The illustrations are drawn in code in `src/components/site/illustrations.tsx`, so they need no image files and can be recoloured there.
 
 ## Rebranding
 
