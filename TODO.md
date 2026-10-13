@@ -1,40 +1,33 @@
 # Website TODO
 
-Follow-ups for the public website (`/site`). The look is inspired by greenit-solution.de, but every illustration, text and layout here is our own. Don't copy their artwork, photos or wording.
+Follow-ups for the public website (`/site`). The design takes its cue from the client's reference site, but every layout, text and visual here is our own. Don't copy the reference's copy, images or code.
 
 ## Done
 
-- [x] Teal, grotesk-type design with lime pills, flat illustrations and laptop mockups using real Hub screenshots
-- [x] Full-screen home hero with large headline, growing vines, satisfaction seal and scroll-down button
-- [x] Sticky services section: each service takes over in turn while scrolling (desktop), stacked on mobile
-- [x] "30 min" sticker moved to the laptop's right corner, clear of the camera notch
+- [x] Light, premium redesign: navy type, signature ember-to-blue gradient, Geist with Instrument Serif italic accents
+- [x] Hero with a live dot map of the UK (client pins, light sweep, travelling beam, live ticket card, mouse tilt)
+- [x] Client wordmark marquee, photo sections, services cards, comparison table, testimonials, steps, FAQ and closing call to action
+- [x] Client portal showcase: steps pin while the Hub screenshots swap
+- [x] Inner pages (services, about, contact, 404) in the same design
 
 ## Next
 
-### Service pages (`/site/[slug]`)
-- [ ] Lighter hero (pale tint background, dark heading) to set inner pages apart from the home page
-- [ ] "Your advantages at a glance" block: tick-list grid on a white card
-- [ ] Process steps (numbered, sticky list with an image that changes per step)
-- [ ] FAQ accordion, e.g. driven by a CMS heading "Questions and answers" plus a list
-- [ ] Feature showcase rows (text and image alternating left and right) with a mockup per service
-- [ ] Services overview page listing every service
-
-### Navigation and footer
-- [ ] Mega menu: grouped columns plus a featured card ("All services"), with icons
-- [ ] Translucent "Client login" pill in the header; hide the header while scrolling down and show it on scroll up
-- [ ] Mobile menu: accordion groups, legal links and social links
-- [ ] Footer: legal links (Privacy, Terms, Cookies) once those pages exist, social links, accreditation badges
-
-### Home page polish
-- [ ] Values section: wide centred illustration of the team at work with a large CTA
-- [ ] About section: team photo, or a larger group illustration
-- [ ] Optional subtle grain texture on illustrations
-
-### Contact
-- [ ] Round icon badges beside "Send an enquiry" and "Or call us directly"
-- [ ] Consent checkbox, plus an optional attachment field
-- [ ] Larger portrait for the named contact, with a phone and email table
-
 ### Content and assets
-- [ ] Client's real logo (`src/components/logo.tsx`, `SiteLogo` in `src/components/site/site-shell.tsx`)
-- [ ] Retake the portal and service-desk screenshots in `public/site/` if the app's look changes
+- [ ] Replace the stock photos in `public/site/photos/` with real DeskSupport team and office photos
+- [ ] Client's real logo (`SiteLogo` in `src/components/site/site-shell.tsx`, `src/components/logo.tsx`)
+- [ ] Confirm the claims on the page with the client (response times, comparison table, security controls)
+- [ ] Real accreditations (e.g. Cyber Essentials, Microsoft partner), only if the client holds them
+
+### Pages
+- [ ] Case studies and an insights or blog listing, driven by the CMS
+- [ ] Services overview page
+- [ ] Privacy, cookies and terms pages, then link them in the footer
+- [ ] Publish the Pricing page once it's ready
+
+### CMS
+- [ ] FAQ editable in the CMS, e.g. a "Questions" heading followed by question and answer pairs
+- [ ] Comparison table and home sections editable in the CMS
+
+### Polish
+- [ ] Dark-mode variant of the site, if the client wants one
+- [ ] Lighthouse pass: image sizes, font loading, Core Web Vitals

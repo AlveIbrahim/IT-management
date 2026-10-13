@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Host_Grotesk } from "next/font/google";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 
 import { Providers } from "@/components/providers";
 import "./globals.css";
@@ -14,10 +14,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Typeface for the public website.
-const hostGrotesk = Host_Grotesk({
-  variable: "--font-host-grotesk",
+// Italic accents in the public website's headlines.
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
   subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -27,7 +29,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en-GB" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${hostGrotesk.variable} h-full antialiased`}>
+    <html lang="en-GB" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}>
       <body className="min-h-full">
         <Providers>{children}</Providers>
       </body>

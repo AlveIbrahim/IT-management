@@ -1,51 +1,47 @@
 "use client";
 
 import { useMemo } from "react";
-import { Phone } from "lucide-react";
+import { ArrowRight, CheckCircle2, Phone } from "lucide-react";
 
 import { parsePageBody } from "@/lib/site-content";
 import type { ContentItem } from "@/lib/types";
-import { cn } from "@/lib/utils";
 
-import { Avatar, avatarLook } from "./illustrations";
-import { ArtPanel, CmsSections, ContactSection, OtherServices, PageHero, QuoteBlock, Sticker, TeamMember } from "./sections";
-import { Container, Reveal, SiteLink, headingClass, scrollToId, telHref, useSiteData } from "./site-kit";
+import { CmsSections, ContactSection, CtaBand, OtherServices, PageHero, QuoteBlock } from "./sections";
+import { Reveal, SiteLink, scrollToId, telHref, useSiteData } from "./site-kit";
+import { BrowserFrame, FloatCard, InitialsAvatar, PhotoFrame, UkMap } from "./visuals";
 
-/** Four portraits on a sunny square: the About page's hero art. */
-function TeamArt() {
-  const { team } = useSiteData();
-  return (
-    <div className="bg-site-sun-soft relative grid aspect-square grid-cols-2 place-items-center gap-4 rounded-[2rem] p-[12%]">
-      {team.slice(0, 4).map((user, i) => (
-        <Avatar
-          key={user.id}
-          look={avatarLook(user.id)}
-          className={cn("w-full max-w-44", i % 2 === 1 && "translate-y-[18%]", i < 2 && "-translate-y-[6%]")}
-        />
-      ))}
-    </div>
-  );
-}
-
-/** The service desk lead, saying hello: the Contact page's hero art. */
-function ContactArt() {
-  const { lead, settings } = useSiteData();
-  if (!lead) return null;
-  return (
-    <div className="relative mx-auto max-w-md pt-8 pb-4">
-      <Avatar look={avatarLook(lead.id)} className="mx-auto w-[62%]" />
-      <div
-        className="site-pop text-site-ink absolute top-0 left-0 max-w-[15rem] rounded-3xl rounded-bl-md bg-white px-5 py-4 text-lg leading-snug shadow-[0_20px_40px_-20px_rgb(0_0_0/0.5)]"
-        style={{ animationDelay: "500ms" }}
-      >
-        Hi, I&apos;m {lead.name.split(" ")[0]}. How can we help?
+/** The hero picture for a page, chosen from words in its slug. */
+function HeroVisual({ slug }: { slug: string }) {
+  const { csat, urgentMinutes } = useSiteData();
+  if (/cloud|microsoft|365/i.test(slug)) {
+    return (
+      <div className="relative">
+        <BrowserFrame src="/site/app-dashboard.webp" alt="The DeskSupport dashboard showing tickets, response times and satisfaction" priority />
+        <FloatCard className="site-float -bottom-6 left-4 w-56 sm:-left-6">
+          <p className="text-site-muted font-mono text-[10.5px] tracking-[0.08em] uppercase">Microsoft 365</p>
+          <p className="text-site-ink mt-1 text-[13.5px] font-semibold">Mailboxes migrated, zero downtime</p>
+        </FloatCard>
       </div>
-      <Sticker
-        title="Free!"
-        note={`(IT review, no strings at ${settings.brandName})`}
-        className="absolute right-0 bottom-0 w-[34%] min-w-28"
-      />
-    </div>
+    );
+  }
+  const photo = /secur|cyber/i.test(slug)
+    ? { src: "/site/photos/server-racks.webp", alt: "Server racks with neatly patched network cables" }
+    : /about/i.test(slug)
+      ? { src: "/site/photos/engineers.webp", alt: "Two engineers working at their desks in a bright office" }
+      : { src: "/site/photos/helping-hand.webp", alt: "Two colleagues working through a problem together at a desk" };
+  return (
+    <PhotoFrame src={photo.src} alt={photo.alt} className="aspect-[4/3.4]" sizes="(min-width: 1024px) 45vw, 100vw">
+      <FloatCard className="site-float -bottom-6 left-4 w-56 sm:-left-6">
+        <p className="text-site-muted font-mono text-[10.5px] tracking-[0.08em] uppercase">Urgent response</p>
+        <p className="text-site-ink mt-1 text-2xl font-semibold tracking-[-0.03em]">{urgentMinutes} minutes</p>
+      </FloatCard>
+      <FloatCard className="site-float-delay -top-5 right-4 w-48 sm:-right-6">
+        <p className="text-site-ink flex items-center gap-2 text-[13.5px] font-semibold">
+          <CheckCircle2 className="size-4 text-emerald-600" />
+          {csat}% satisfaction
+        </p>
+      </FloatCard>
+    </PhotoFrame>
   );
 }
 
@@ -53,38 +49,15 @@ function ContactArt() {
 function TeamPortraits() {
   const { team } = useSiteData();
   return (
-    <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3">
+    <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3">
       {team.map((user, i) => (
-        <Reveal key={user.id} delay={i * 70}>
-          <TeamMember user={user} />
+        <Reveal as="li" key={user.id} delay={i * 60} className="border-site-line rounded-[20px] border bg-white p-5">
+          <InitialsAvatar name={user.name} index={i} className="size-12 text-[15px] ring-0" />
+          <p className="text-site-ink mt-4 font-semibold tracking-[-0.01em]">{user.name}</p>
+          <p className="text-site-muted text-[13.5px]">{user.jobTitle}</p>
         </Reveal>
       ))}
-    </div>
-  );
-}
-
-/** Fallback when the About page has no "team" section to sit under. */
-function TeamGrid() {
-  const { team, settings } = useSiteData();
-  if (team.length === 0) return null;
-  return (
-    <section className="bg-site-soft py-24 lg:py-32">
-      <Container>
-        <Reveal className="max-w-2xl">
-          <h2 className={headingClass.section}>Meet the team</h2>
-          <p className="text-site-text mt-5 text-lg leading-relaxed">
-            The people who answer when you call {settings.brandName}. No call centre and no scripts.
-          </p>
-        </Reveal>
-        <div className="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 sm:grid-cols-3 lg:grid-cols-6">
-          {team.map((user, i) => (
-            <Reveal key={user.id} delay={i * 70}>
-              <TeamMember user={user} />
-            </Reveal>
-          ))}
-        </div>
-      </Container>
-    </section>
+    </ul>
   );
 }
 
@@ -92,30 +65,29 @@ export function ContentPage({ page }: { page: ContentItem }) {
   const { services, settings } = useSiteData();
   const parsed = useMemo(() => parsePageBody(page.body), [page.body]);
   const isService = services.some((s) => s.slug === page.slug);
-  const isAbout = page.slug === "about";
-  const teamIndex = isAbout ? parsed.sections.findIndex((s) => /team|people/i.test(s.title ?? "")) : -1;
+  const teamIndex = page.slug === "about" ? parsed.sections.findIndex((s) => /team|people/i.test(s.title ?? "")) : -1;
 
   return (
     <>
       <PageHero
-        trail={[{ label: "Home", href: "/site" }, { label: page.title }]}
+        trail={[{ label: "Home", href: "/site" }, ...(isService ? [{ label: "Services", href: "/site#services" }] : []), { label: page.title }]}
         title={parsed.heading ?? page.title}
         lead={parsed.lead ?? page.excerpt}
-        art={isService ? <ArtPanel kind={`${page.slug} ${page.title}`} /> : isAbout ? <TeamArt /> : null}
+        visual={<HeroVisual slug={page.slug} />}
       >
         <SiteLink href="/site/contact" size="lg">
           Book a free IT review
+          <ArrowRight className="arrow" />
         </SiteLink>
-        <SiteLink href={telHref(settings.supportPhone)} variant="lightOutline" size="lg">
+        <SiteLink href={telHref(settings.supportPhone)} variant="outline" size="lg">
           <Phone />
           {settings.supportPhone}
         </SiteLink>
       </PageHero>
       <CmsSections sections={parsed.sections} after={(i) => (i === teamIndex ? <TeamPortraits /> : null)} />
-      {isAbout && teamIndex === -1 && <TeamGrid />}
-      {parsed.quote && <QuoteBlock quote={parsed.quote} className={isAbout ? "pt-20 lg:pt-28" : undefined} />}
+      {parsed.quote && <QuoteBlock quote={parsed.quote} />}
       {isService && <OtherServices current={page.slug} />}
-      <ContactSection />
+      <CtaBand />
     </>
   );
 }
@@ -129,12 +101,13 @@ export function ContactPage({ page }: { page: ContentItem }) {
         trail={[{ label: "Home", href: "/site" }, { label: page.title }]}
         title={parsed.heading ?? page.title}
         lead={parsed.lead ?? page.excerpt}
-        art={<ContactArt />}
+        visual={<UkMap className="mx-auto w-full max-w-[300px] lg:max-w-[340px]" />}
       >
         <SiteLink href="#contact" size="lg" onClick={(e) => scrollToId(e, "contact")}>
           Send an enquiry
+          <ArrowRight className="arrow" />
         </SiteLink>
-        <SiteLink href={telHref(settings.supportPhone)} variant="lightOutline" size="lg">
+        <SiteLink href={telHref(settings.supportPhone)} variant="outline" size="lg">
           <Phone />
           {settings.supportPhone}
         </SiteLink>
@@ -155,12 +128,13 @@ export function NotFoundPage() {
       >
         <SiteLink href="/site" size="lg">
           Back to the homepage
+          <ArrowRight className="arrow" />
         </SiteLink>
-        <SiteLink href="/site/contact" variant="lightOutline" size="lg">
+        <SiteLink href="/site/contact" variant="outline" size="lg">
           Contact us
         </SiteLink>
       </PageHero>
-      <ContactSection />
+      <CtaBand />
     </>
   );
 }
