@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { CheckCircle2, Lock } from "lucide-react";
 
 import { useAppStore } from "@/lib/store";
@@ -71,53 +71,114 @@ function useLiveFeed() {
 /** A twinkling subset of dots, like network activity. */
 const TWINKLES = GB_DOTS.filter((_, i) => i % 23 === 7);
 
+/** Resting angle of the map: tipped back and turned a little, like a model on a desk. */
+const BASE = { rx: 46, rz: -12 };
+/** How far the pin beacons stand above the map, in px. */
+const BEACON = 46;
+const VIEWBOX = `0 0 ${UK_MAP.width} ${UK_MAP.height}`;
+
 /** Quadratic arc between two pins, bowed upwards. */
 function arcPath(a: readonly [number, number], b: readonly [number, number]) {
   const dist = Math.hypot(b[0] - a[0], b[1] - a[1]);
   return `M${a[0]} ${a[1]} Q${(a[0] + b[0]) / 2} ${(a[1] + b[1]) / 2 - dist * 0.38} ${b[0]} ${b[1]}`;
 }
 
-/** The dots themselves never change, so they are built once. */
+/** The dots never change, so they are built once. */
 function MapDots() {
   return (
     <>
-      <g fill="#cdd6ee">
-        {IE_DOTS.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="1.6" />
-        ))}
-      </g>
-      <g fill="url(#uk-dots)">
-        {GB_DOTS.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="2.35" />
-        ))}
-      </g>
-      {/* A warm light wave that sweeps across the map. */}
-      <g fill="url(#uk-hot)" mask="url(#uk-sweep)">
-        {GB_DOTS.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="2.7" />
-        ))}
-      </g>
-      <g fill="#ff6a3d">
-        {TWINKLES.map(([x, y], i) => (
-          <circle key={i} cx={x} cy={y} r="2.6" className="uk-twinkle" style={{ animationDelay: `${((i * 0.73) % 4.2).toFixed(2)}s` }} />
-        ))}
-      </g>
+      {/* Thickness: a darker copy of the dots just below the surface. */}
+      <svg viewBox={VIEWBOX} className="absolute inset-0 size-full [transform:translateZ(-9px)]" aria-hidden focusable="false">
+        <g fill="#14215f" opacity="0.5">
+          {GB_DOTS.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="2.35" />
+          ))}
+        </g>
+      </svg>
+      <svg viewBox={VIEWBOX} className="absolute inset-0 size-full overflow-visible" aria-hidden focusable="false">
+        <defs>
+          <linearGradient id="uk-dots" gradientUnits="userSpaceOnUse" x1="120" y1="40" x2="460" y2="800">
+            <stop offset="0" stopColor="#7b5cff" />
+            <stop offset="0.45" stopColor="#2f5bff" />
+            <stop offset="1" stopColor="#0a1128" />
+          </linearGradient>
+          <linearGradient id="uk-hot" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="520" y2="820">
+            <stop offset="0" stopColor="#ff6a3d" />
+            <stop offset="0.5" stopColor="#e5487f" />
+            <stop offset="1" stopColor="#7b5cff" />
+          </linearGradient>
+          <linearGradient id="uk-sweep-fade" x1="0" x2="1" y1="0" y2="0">
+            <stop offset="0" stopColor="#fff" stopOpacity="0" />
+            <stop offset="0.5" stopColor="#fff" stopOpacity="1" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0" />
+          </linearGradient>
+          <mask id="uk-sweep" maskUnits="userSpaceOnUse" x="-200" y="-200" width="920" height="1220">
+            <g transform="rotate(22 260 410)">
+              <rect className="uk-sweep" x="-260" y="-400" width="170" height="1700" fill="url(#uk-sweep-fade)" />
+            </g>
+          </mask>
+        </defs>
+        <g fill="#cdd6ee">
+          {IE_DOTS.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="1.6" />
+          ))}
+        </g>
+        <g fill="url(#uk-dots)">
+          {GB_DOTS.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="2.35" />
+          ))}
+        </g>
+        {/* A warm light wave that sweeps across the map. */}
+        <g fill="url(#uk-hot)" mask="url(#uk-sweep)">
+          {GB_DOTS.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="2.7" />
+          ))}
+        </g>
+        <g fill="#ff6a3d">
+          {TWINKLES.map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="2.6" className="uk-twinkle" style={{ animationDelay: `${((i * 0.73) % 4.2).toFixed(2)}s` }} />
+          ))}
+        </g>
+      </svg>
     </>
   );
 }
 
 /**
- * Dot-matrix map of the UK with a pin for every client city. A light wave
- * sweeps the dots, arcs link the clients, and a beam travels to each client
- * in turn while a card shows their quickest recent fix. It tilts towards the
- * mouse. All motion stops for reduced-motion users.
+ * A dot-matrix map of the UK lying in 3D, tipped back like a model on a desk.
+ * Each client city has a beacon standing above the map; arcs float between
+ * them, a beam travels to each client in turn and a card shows their quickest
+ * recent fix. The map eases towards the cursor and drifts gently on its own.
+ * All motion stops for reduced-motion users.
  */
 export function UkMap({ className }: { className?: string }) {
   const feed = useLiveFeed();
   const inProgress = useAppStore((s) => s.tickets.filter((t) => t.status === "in_progress").length);
   const [step, setStep] = useState({ active: 0, previous: -1 });
-  const tiltRef = useRef<HTMLDivElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const headsRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const activeRef = useRef(0);
   const dots = useMemo(() => <MapDots />, []);
+
+  const active = feed.length ? step.active % feed.length : 0;
+  const current = feed[active];
+  const previous = step.previous >= 0 ? feed[step.previous % feed.length] : null;
+
+  // Keep the card beside the active beacon, wherever the 3D map has put it.
+  const placeCard = useCallback(() => {
+    const wrap = wrapRef.current;
+    const card = cardRef.current;
+    const head = headsRef.current[activeRef.current];
+    if (!wrap || !card || !head) return;
+    const w = wrap.getBoundingClientRect();
+    const h = head.getBoundingClientRect();
+    const x = h.left + h.width / 2 - w.left;
+    card.style.setProperty("--card-x", `${x.toFixed(1)}px`);
+    card.style.setProperty("--card-y", `${(h.top + h.height / 2 - w.top).toFixed(1)}px`);
+    card.dataset.flip = String(x > w.width * 0.55);
+  }, []);
 
   useEffect(() => {
     if (feed.length < 2) return;
@@ -125,130 +186,170 @@ export function UkMap({ className }: { className?: string }) {
     return () => window.clearInterval(timer);
   }, [feed.length]);
 
-  const onPointerMove = (e: React.PointerEvent) => {
-    const el = tiltRef.current;
-    if (!el || e.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const rect = el.getBoundingClientRect();
-    el.style.setProperty("--uk-ry", `${(((e.clientX - rect.left) / rect.width - 0.5) * 12).toFixed(2)}deg`);
-    el.style.setProperty("--uk-rx", `${(-((e.clientY - rect.top) / rect.height - 0.5) * 10).toFixed(2)}deg`);
-  };
-  const onPointerLeave = () => {
-    tiltRef.current?.style.removeProperty("--uk-rx");
-    tiltRef.current?.style.removeProperty("--uk-ry");
-  };
+  useLayoutEffect(() => {
+    activeRef.current = active;
+    placeCard();
+    const settle = window.setTimeout(placeCard, 520);
+    return () => window.clearTimeout(settle);
+  }, [active, placeCard]);
 
-  const active = feed.length ? step.active % feed.length : 0;
-  const current = feed[active];
-  const previous = step.previous >= 0 ? feed[step.previous % feed.length] : null;
-  const left = current ? (current.pin[0] / UK_MAP.width) * 100 : 0;
-  const top = current ? (current.pin[1] / UK_MAP.height) * 100 : 0;
-  const flip = left > 52;
+  // Ease the map towards the cursor with a light, springy follow.
+  useEffect(() => {
+    const wrap = wrapRef.current;
+    const stage = stageRef.current;
+    if (!wrap || !stage) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const m = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
+    let frame = 0;
+    const step = () => {
+      frame = 0;
+      m.x += (m.tx - m.x) * 0.075;
+      m.y += (m.ty - m.y) * 0.075;
+      stage.style.setProperty("--uk-rx", `${(BASE.rx - (m.y - 0.5) * 16).toFixed(2)}deg`);
+      stage.style.setProperty("--uk-rz", `${(BASE.rz + (m.x - 0.5) * 14).toFixed(2)}deg`);
+      stage.style.setProperty("--uk-ry", `${((m.x - 0.5) * 8).toFixed(2)}deg`);
+      stage.style.setProperty("--uk-shift-x", `${((m.x - 0.5) * 14).toFixed(1)}px`);
+      stage.style.setProperty("--uk-shift-y", `${((m.y - 0.5) * 10).toFixed(1)}px`);
+      placeCard();
+      if (Math.abs(m.tx - m.x) > 0.001 || Math.abs(m.ty - m.y) > 0.001) frame = requestAnimationFrame(step);
+    };
+    const onMove = (e: PointerEvent) => {
+      if (reduce || e.pointerType !== "mouse") return;
+      const r = wrap.getBoundingClientRect();
+      m.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
+      m.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
+      if (!frame) frame = requestAnimationFrame(step);
+    };
+    const onLeave = () => {
+      m.tx = 0.5;
+      m.ty = 0.5;
+      if (!frame) frame = requestAnimationFrame(step);
+    };
+    wrap.addEventListener("pointermove", onMove);
+    wrap.addEventListener("pointerleave", onLeave);
+    window.addEventListener("resize", placeCard);
+    return () => {
+      cancelAnimationFrame(frame);
+      wrap.removeEventListener("pointermove", onMove);
+      wrap.removeEventListener("pointerleave", onLeave);
+      window.removeEventListener("resize", placeCard);
+    };
+  }, [placeCard]);
+
+  const pinStyle = (pin: readonly [number, number]) => ({ left: `${(pin[0] / UK_MAP.width) * 100}%`, top: `${(pin[1] / UK_MAP.height) * 100}%` });
 
   return (
-    <div className={cn("relative aspect-[520/820]", className)} onPointerMove={onPointerMove} onPointerLeave={onPointerLeave}>
-      <div ref={tiltRef} className="uk-tilt absolute inset-0">
-        <div aria-hidden className="absolute inset-[6%] rounded-full bg-[radial-gradient(closest-side,rgb(47_91_255/0.16),transparent)] blur-2xl" />
-        <svg viewBox={`0 0 ${UK_MAP.width} ${UK_MAP.height}`} className="absolute inset-0 size-full overflow-visible" aria-hidden focusable="false">
-          <defs>
-            <linearGradient id="uk-dots" gradientUnits="userSpaceOnUse" x1="120" y1="40" x2="460" y2="800">
-              <stop offset="0" stopColor="#7b5cff" />
-              <stop offset="0.45" stopColor="#2f5bff" />
-              <stop offset="1" stopColor="#0a1128" />
-            </linearGradient>
-            <linearGradient id="uk-hot" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="520" y2="820">
-              <stop offset="0" stopColor="#ff6a3d" />
-              <stop offset="0.5" stopColor="#e5487f" />
-              <stop offset="1" stopColor="#7b5cff" />
-            </linearGradient>
-            <linearGradient id="uk-sweep-fade" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0" stopColor="#fff" stopOpacity="0" />
-              <stop offset="0.5" stopColor="#fff" stopOpacity="1" />
-              <stop offset="1" stopColor="#fff" stopOpacity="0" />
-            </linearGradient>
-            <mask id="uk-sweep" maskUnits="userSpaceOnUse" x="-200" y="-200" width="920" height="1220">
-              <g transform="rotate(22 260 410)">
-                <rect className="uk-sweep" x="-260" y="-400" width="170" height="1700" fill="url(#uk-sweep-fade)" />
-              </g>
-            </mask>
-            <linearGradient id="uk-arc" x1="0" x2="1" y1="0" y2="0">
-              <stop offset="0" stopColor="#ff6a3d" />
-              <stop offset="1" stopColor="#7b5cff" />
-            </linearGradient>
-            <radialGradient id="uk-pin">
-              <stop offset="0" stopColor="#ff6a3d" />
-              <stop offset="1" stopColor="#e5487f" />
-            </radialGradient>
-            <radialGradient id="uk-halo">
-              <stop offset="0" stopColor="#ff6a3d" stopOpacity="0.45" />
-              <stop offset="1" stopColor="#ff6a3d" stopOpacity="0" />
-            </radialGradient>
-          </defs>
+    <div ref={wrapRef} className={cn("relative flex aspect-[520/690] items-center justify-center [perspective:1300px]", className)}>
+      <div ref={stageRef} className="uk-stage relative aspect-[520/820] w-full shrink-0">
+        <div className="uk-idle absolute inset-0">
+          {/* Soft shadow on the "desk" below the map. */}
+          <div
+            aria-hidden
+            className="absolute inset-x-[14%] inset-y-[18%] rounded-full bg-[radial-gradient(closest-side,rgb(20_33_95/0.28),transparent)] blur-2xl [transform:translateZ(-60px)]"
+          />
           {dots}
-          <g fill="none" stroke="url(#uk-arc)" strokeWidth="1.2" strokeDasharray="2 5" strokeLinecap="round" opacity="0.5">
-            {feed.slice(1).map((item, i) => (
-              <path key={item.id} d={arcPath(feed[i].pin, item.pin)} />
-            ))}
-          </g>
-          {previous && current && (
-            <path
-              key={`${previous.id}-${current.id}`}
-              d={arcPath(previous.pin, current.pin)}
-              pathLength={1}
-              className="uk-beam"
-              stroke="url(#uk-arc)"
-              strokeWidth="3"
-              strokeLinecap="round"
-              fill="none"
+          {current && (
+            <span
+              aria-hidden
+              className="absolute size-24 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_106_61/0.45),transparent)] transition-[left,top] duration-700"
+              style={pinStyle(current.pin)}
             />
           )}
+
+          {/* Beacons: a ripple on the ground, a stem of light and a glowing head. */}
           {feed.map((item, i) => {
             const on = i === active;
             return (
-              <g key={item.id} transform={`translate(${item.pin[0]} ${item.pin[1]})`}>
-                {on && <circle r="34" fill="url(#uk-halo)" />}
-                {on && <circle key={step.active} r="11" fill="none" stroke="#ff6a3d" strokeWidth="2" className="uk-ripple" />}
-                <circle r="16" fill="#ff6a3d" className="site-pulse" style={{ animationDelay: `${(i % 4) * 0.6}s` }} />
-                <circle r={on ? 9 : 6.5} fill="#fff" className="transition-all duration-500" />
-                <circle r={on ? 5.5 : 4} fill="url(#uk-pin)" className="transition-all duration-500" />
-              </g>
+              <div key={item.id} aria-hidden className="absolute [transform-style:preserve-3d]" style={pinStyle(item.pin)}>
+                <span className="uk-ground absolute -top-6 -left-6 size-12 rounded-full border-2 border-[#ff6a3d]" style={{ animationDelay: `${(i % 4) * 0.7}s` }} />
+                <span
+                  className={cn(
+                    "absolute top-0 -left-[1.5px] w-[3px] origin-top rounded-full bg-gradient-to-b from-[#ff6a3d]/0 via-[#ff6a3d]/70 to-[#ff6a3d] shadow-[0_0_10px_rgb(255_106_61/0.6)] transition-opacity duration-500 [transform:rotateX(90deg)]",
+                    on ? "opacity-100" : "opacity-60",
+                  )}
+                  style={{ height: BEACON }}
+                />
+                <span
+                  ref={(el) => {
+                    headsRef.current[i] = el;
+                  }}
+                  className="absolute -top-2 -left-2 grid size-4 place-items-center rounded-full bg-white shadow-[0_0_0_4px_rgb(255_106_61/0.16),0_6px_18px_rgb(255_106_61/0.55)] transition-transform duration-500"
+                  style={{ transform: `translateZ(${BEACON}px) rotateZ(${-BASE.rz}deg) rotateX(${-BASE.rx}deg) scale(${on ? 1.45 : 1})` }}
+                >
+                  <span className="size-2 rounded-full bg-[linear-gradient(135deg,#ff6a3d,#e5487f)]" />
+                </span>
+              </div>
             );
           })}
-        </svg>
 
-        <div className="border-site-line text-site-ink absolute top-[1%] right-0 inline-flex items-center gap-2 rounded-full border bg-white/85 py-1.5 pr-3.5 pl-2.5 text-[12px] font-medium shadow-[0_10px_24px_-14px_rgb(10_17_40/0.4)] backdrop-blur">
-          <span className="relative flex size-2">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/60 motion-reduce:hidden" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-          </span>
-          Live
-          <span className="text-site-muted">· {inProgress} being fixed now</span>
-        </div>
-
-        {current && (
-          <div
-            key={current.id}
-            className="pointer-events-none absolute z-10 w-[min(250px,78vw)] max-sm:bottom-0 max-sm:left-1/2 max-sm:-translate-x-1/2 sm:top-[var(--pin-y)] sm:left-[var(--pin-x)] sm:translate-x-[var(--pin-shift)] sm:-translate-y-1/2"
-            style={{ "--pin-x": `${left}%`, "--pin-y": `${top}%`, "--pin-shift": flip ? "calc(-100% - 24px)" : "24px" } as React.CSSProperties}
+          {/* Arcs float between the beacons, at the same height as their heads. */}
+          <svg
+            viewBox={VIEWBOX}
+            className="pointer-events-none absolute inset-0 size-full overflow-visible"
+            style={{ transform: `translateZ(${BEACON}px)` }}
+            aria-hidden
+            focusable="false"
           >
-            <div className="site-pop">
-              <div className="rounded-2xl border border-white/70 bg-white/85 p-3.5 shadow-[0_24px_48px_-24px_rgb(10_17_40/0.45)] backdrop-blur-xl">
-                <p className="text-site-muted flex items-center justify-between font-mono text-[10.5px] tracking-[0.08em] uppercase">
-                  <span className="truncate">{current.city}</span>
-                  <span className="text-site-blue">Resolved</span>
+            <defs>
+              <linearGradient id="uk-arc" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stopColor="#ff6a3d" />
+                <stop offset="1" stopColor="#7b5cff" />
+              </linearGradient>
+            </defs>
+            <g fill="none" stroke="url(#uk-arc)" strokeWidth="1.4" strokeDasharray="2 5" strokeLinecap="round" opacity="0.55">
+              {feed.slice(1).map((item, i) => (
+                <path key={item.id} d={arcPath(feed[i].pin, item.pin)} />
+              ))}
+            </g>
+            {previous && current && (
+              <path
+                key={`${previous.id}-${current.id}`}
+                d={arcPath(previous.pin, current.pin)}
+                pathLength={1}
+                className="uk-beam"
+                stroke="url(#uk-arc)"
+                strokeWidth="3.2"
+                strokeLinecap="round"
+                fill="none"
+              />
+            )}
+          </svg>
+        </div>
+      </div>
+
+      <div className="border-site-line text-site-ink absolute top-[1%] right-0 inline-flex items-center gap-2 rounded-full border bg-white/85 py-1.5 pr-3.5 pl-2.5 text-[12px] font-medium shadow-[0_10px_24px_-14px_rgb(10_17_40/0.4)] backdrop-blur">
+        <span className="relative flex size-2">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500/60 motion-reduce:hidden" />
+          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+        </span>
+        Live
+        <span className="text-site-muted">· {inProgress} being fixed now</span>
+      </div>
+
+      {current && (
+        <div
+          ref={cardRef}
+          key={current.id}
+          className="pointer-events-none absolute z-10 w-[min(250px,78vw)] max-sm:bottom-0 max-sm:left-1/2 max-sm:-translate-x-1/2 sm:top-[var(--card-y,50%)] sm:left-[var(--card-x,50%)] sm:translate-x-6 sm:-translate-y-1/2 sm:data-[flip=true]:translate-x-[calc(-100%-24px)]"
+        >
+          <div className="site-pop">
+            <div className="rounded-2xl border border-white/70 bg-white/85 p-3.5 shadow-[0_24px_48px_-24px_rgb(10_17_40/0.45)] backdrop-blur-xl">
+              <p className="text-site-muted flex items-center justify-between font-mono text-[10.5px] tracking-[0.08em] uppercase">
+                <span className="truncate">{current.city}</span>
+                <span className="text-site-blue">Resolved</span>
+              </p>
+              <p className="text-site-ink mt-1.5 truncate text-[13.5px] font-semibold">{current.company}</p>
+              <p className="text-site-text mt-0.5 line-clamp-2 text-[12.5px] leading-snug">{current.subject}</p>
+              {current.took && (
+                <p className="mt-2.5 flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
+                  <CheckCircle2 className="size-3.5" />
+                  Fixed in {current.took}
                 </p>
-                <p className="text-site-ink mt-1.5 truncate text-[13.5px] font-semibold">{current.company}</p>
-                <p className="text-site-text mt-0.5 line-clamp-2 text-[12.5px] leading-snug">{current.subject}</p>
-                {current.took && (
-                  <p className="mt-2.5 flex items-center gap-1.5 text-[12px] font-medium text-emerald-600">
-                    <CheckCircle2 className="size-3.5" />
-                    Fixed in {current.took}
-                  </p>
-                )}
-              </div>
+              )}
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
