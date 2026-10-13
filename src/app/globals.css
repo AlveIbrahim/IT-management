@@ -350,16 +350,10 @@
     animation: site-trail 6s linear infinite;
   }
 
-  /* UK map: 3D stage, idle drift, light sweep, twinkles, travelling beam, beacon ripples. */
+  /* UK map: a fixed 3D tilt, light sweep, twinkles, travelling beam, beacon ripples. */
   .uk-stage {
-    transform: translate3d(var(--uk-shift-x, 0px), var(--uk-shift-y, 0px), 0) rotateX(var(--uk-rx, 46deg)) rotateY(var(--uk-ry, 0deg))
-      rotateZ(var(--uk-rz, -12deg));
+    transform: rotateX(46deg) rotateZ(-12deg);
     transform-style: preserve-3d;
-    will-change: transform;
-  }
-  .uk-idle {
-    transform-style: preserve-3d;
-    animation: uk-idle 16s ease-in-out infinite;
   }
   .uk-sweep {
     animation: uk-sweep 7s cubic-bezier(0.45, 0, 0.2, 1) infinite;
@@ -454,15 +448,6 @@
     stroke-dashoffset: -1.1;
   }
 }
-@keyframes uk-idle {
-  0%,
-  100% {
-    transform: translateZ(0) rotateZ(0deg);
-  }
-  50% {
-    transform: translateZ(12px) rotateZ(1.4deg);
-  }
-}
 @keyframes uk-ground {
   from {
     opacity: 0.85;
@@ -505,7 +490,6 @@
   .scroll-word {
     opacity: 1 !important;
   }
-  .uk-idle,
   .uk-sweep {
     animation: none !important;
   }

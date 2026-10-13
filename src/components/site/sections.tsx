@@ -113,12 +113,15 @@ export function PageHero({
   title,
   lead,
   visual,
+  visualStill = false,
   children,
 }: {
   trail: { label: string; href?: string }[];
   title: string;
   lead?: string | null;
   visual?: React.ReactNode;
+  /** Show the visual without an entrance animation (e.g. the map). */
+  visualStill?: boolean;
   children?: React.ReactNode;
 }) {
   return (
@@ -159,7 +162,7 @@ export function PageHero({
           )}
         </div>
         {visual && (
-          <div className="site-enter relative lg:col-span-6" style={{ animationDelay: "200ms" }}>
+          <div className={cn("relative lg:col-span-6", !visualStill && "site-enter")} style={visualStill ? undefined : { animationDelay: "200ms" }}>
             {visual}
           </div>
         )}

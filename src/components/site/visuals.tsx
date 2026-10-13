@@ -28,7 +28,6 @@ function decode(rows: readonly string[]) {
 }
 
 const GB_DOTS = decode(UK_MAP.gb);
-const IE_DOTS = decode(UK_MAP.ie);
 
 function duration(fromIso: string, toIso: string) {
   const minutes = Math.max(1, Math.round((new Date(toIso).getTime() - new Date(fromIso).getTime()) / 60000));
@@ -118,11 +117,6 @@ function MapDots() {
             </g>
           </mask>
         </defs>
-        <g fill="#cdd6ee">
-          {IE_DOTS.map(([x, y], i) => (
-            <circle key={i} cx={x} cy={y} r="1.6" />
-          ))}
-        </g>
         <g fill="url(#uk-dots)">
           {GB_DOTS.map(([x, y], i) => (
             <circle key={i} cx={x} cy={y} r="2.35" />
@@ -148,15 +142,14 @@ function MapDots() {
  * A dot-matrix map of the UK lying in 3D, tipped back like a model on a desk.
  * Each client city has a beacon standing above the map; arcs float between
  * them, a beam travels to each client in turn and a card shows their quickest
- * recent fix. The map eases towards the cursor and drifts gently on its own.
- * All motion stops for reduced-motion users.
+ * recent fix. The map itself stays still; the effects on it stop for
+ * reduced-motion users.
  */
 export function UkMap({ className }: { className?: string }) {
   const feed = useLiveFeed();
   const inProgress = useAppStore((s) => s.tickets.filter((t) => t.status === "in_progress").length);
   const [step, setStep] = useState({ active: 0, previous: -1 });
   const wrapRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const headsRef = useRef<(HTMLSpanElement | null)[]>([]);
   const activeRef = useRef(0);
@@ -193,55 +186,16 @@ export function UkMap({ className }: { className?: string }) {
     return () => window.clearTimeout(settle);
   }, [active, placeCard]);
 
-  // Ease the map towards the cursor with a light, springy follow.
   useEffect(() => {
-    const wrap = wrapRef.current;
-    const stage = stageRef.current;
-    if (!wrap || !stage) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const m = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
-    let frame = 0;
-    const step = () => {
-      frame = 0;
-      m.x += (m.tx - m.x) * 0.075;
-      m.y += (m.ty - m.y) * 0.075;
-      stage.style.setProperty("--uk-rx", `${(BASE.rx - (m.y - 0.5) * 16).toFixed(2)}deg`);
-      stage.style.setProperty("--uk-rz", `${(BASE.rz + (m.x - 0.5) * 14).toFixed(2)}deg`);
-      stage.style.setProperty("--uk-ry", `${((m.x - 0.5) * 8).toFixed(2)}deg`);
-      stage.style.setProperty("--uk-shift-x", `${((m.x - 0.5) * 14).toFixed(1)}px`);
-      stage.style.setProperty("--uk-shift-y", `${((m.y - 0.5) * 10).toFixed(1)}px`);
-      placeCard();
-      if (Math.abs(m.tx - m.x) > 0.001 || Math.abs(m.ty - m.y) > 0.001) frame = requestAnimationFrame(step);
-    };
-    const onMove = (e: PointerEvent) => {
-      if (reduce || e.pointerType !== "mouse") return;
-      const r = wrap.getBoundingClientRect();
-      m.tx = Math.min(1, Math.max(0, (e.clientX - r.left) / r.width));
-      m.ty = Math.min(1, Math.max(0, (e.clientY - r.top) / r.height));
-      if (!frame) frame = requestAnimationFrame(step);
-    };
-    const onLeave = () => {
-      m.tx = 0.5;
-      m.ty = 0.5;
-      if (!frame) frame = requestAnimationFrame(step);
-    };
-    wrap.addEventListener("pointermove", onMove);
-    wrap.addEventListener("pointerleave", onLeave);
     window.addEventListener("resize", placeCard);
-    return () => {
-      cancelAnimationFrame(frame);
-      wrap.removeEventListener("pointermove", onMove);
-      wrap.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("resize", placeCard);
-    };
+    return () => window.removeEventListener("resize", placeCard);
   }, [placeCard]);
 
   const pinStyle = (pin: readonly [number, number]) => ({ left: `${(pin[0] / UK_MAP.width) * 100}%`, top: `${(pin[1] / UK_MAP.height) * 100}%` });
 
   return (
     <div ref={wrapRef} className={cn("relative flex aspect-[520/690] items-center justify-center [perspective:1300px]", className)}>
-      <div ref={stageRef} className="uk-stage relative aspect-[520/820] w-full shrink-0">
-        <div className="uk-idle absolute inset-0">
+      <div className="uk-stage relative aspect-[520/820] w-full shrink-0">
           {/* Soft shadow on the "desk" below the map. */}
           <div
             aria-hidden
@@ -314,7 +268,6 @@ export function UkMap({ className }: { className?: string }) {
               />
             )}
           </svg>
-        </div>
       </div>
 
       <div className="border-site-line text-site-ink absolute top-[1%] right-0 inline-flex items-center gap-2 rounded-full border bg-white/85 py-1.5 pr-3.5 pl-2.5 text-[12px] font-medium shadow-[0_10px_24px_-14px_rgb(10_17_40/0.4)] backdrop-blur">

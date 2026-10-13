@@ -5,7 +5,7 @@ Follow-ups for the public website (`/site`). The design takes its cue from the c
 ## Done
 
 - [x] Light, premium redesign: navy type, signature ember-to-blue gradient, Geist with Instrument Serif italic accents
-- [x] Hero with a live dot map of the UK (client pins, light sweep, travelling beam, live ticket card, mouse tilt)
+- [x] Hero with a live 3D dot map of the UK (client beacons, light sweep, travelling beam, live ticket card)
 - [x] Client wordmark marquee, photo sections, services cards, comparison table, testimonials, steps, FAQ and closing call to action
 - [x] Client portal showcase: steps pin while the Hub screenshots swap
 - [x] Inner pages (services, about, contact, 404) in the same design
