@@ -156,7 +156,7 @@ function Hero({ heading, lead }: { heading: string; lead: string }) {
         </div>
 
         <div className="relative lg:col-span-5">
-          <UkMap className="site-enter mx-auto w-full max-w-[330px] sm:max-w-[420px] lg:max-w-[480px]" />
+          <UkMap className="mx-auto w-full max-w-[330px] sm:max-w-[420px] lg:max-w-[480px]" />
           <FloatCard className="site-float top-[4%] left-0 hidden w-48 sm:block lg:-left-6">
             <p className="text-site-muted font-mono text-[10.5px] tracking-[0.08em] uppercase">Client satisfaction</p>
             <p className="text-site-ink mt-1 flex items-end gap-1.5 text-3xl font-semibold tracking-[-0.04em]">
