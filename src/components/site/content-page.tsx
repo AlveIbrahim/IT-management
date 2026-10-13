@@ -101,7 +101,7 @@ export function ContactPage({ page }: { page: ContentItem }) {
         trail={[{ label: "Home", href: "/site" }, { label: page.title }]}
         title={parsed.heading ?? page.title}
         lead={parsed.lead ?? page.excerpt}
-        visual={<UkMap className="mx-auto w-full max-w-[300px] lg:max-w-[340px]" />}
+        visual={<UkMap className="mx-auto w-full max-w-[340px] lg:max-w-[420px]" />}
       >
         <SiteLink href="#contact" size="lg" onClick={(e) => scrollToId(e, "contact")}>
           Send an enquiry
